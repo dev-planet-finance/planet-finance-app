@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { auth } from '@/lib/firebase';
 
 const AuthContext = createContext();
 
@@ -34,8 +34,10 @@ export function AuthProvider({ children }) {
       
       // Get and store the token immediately
       const token = await result.user.getIdToken();
-      localStorage.setItem('firebaseToken', token);
-      localStorage.setItem('firebaseEmail', result.user.email || '');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('firebaseToken', token);
+        localStorage.setItem('firebaseEmail', result.user.email || '');
+      }
       
       console.log('✅ Signup successful, token stored');
       return result;
@@ -53,8 +55,10 @@ export function AuthProvider({ children }) {
       
       // Get and store the token immediately
       const token = await result.user.getIdToken();
-      localStorage.setItem('firebaseToken', token);
-      localStorage.setItem('firebaseEmail', result.user.email || '');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('firebaseToken', token);
+        localStorage.setItem('firebaseEmail', result.user.email || '');
+      }
       
       console.log('✅ Login successful, token stored');
       return result;
