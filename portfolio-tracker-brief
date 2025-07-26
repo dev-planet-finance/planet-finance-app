@@ -1,0 +1,215 @@
+Portfolio Tracker:
+
+Link to GSheet: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?usp=sharing
+
+Description:
+
+This tracker is designed to give the user full visibility over their investments with minimal manual input. Simply enter deposit/buy/purchase or transfer transactions, and let the tracker generate real-time visuals and detailed performance statistics across your investments. 
+
+It includes features to capture cross-platform movements, dividends, crypto and cash interest, cash balances, SPLIT operations, portfolio rebalancing, historical portfolio performance, geographical distribution of funds, and currency conversions.
+
+This is the ultimate tool for the investing journey. Whether actively trading or holding long-term positions, this tracker gives users a complete breakdown of their portfolio and it will uncover insights to help them understand their investment performance to make smarter decisions. Let’s go tab by tab, feature by feature. As the ultimate goal is to translate all of this into a section of the web app / mobile app, which will be then joined with the budget tracker (savings) and debt tracker (liabilities) to show a net worth summary.
+
+Tabs:
+
+‘Transactions’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=852611339#gid=852611339
+
+Here’s the manual input by users. It contains:
+●	Date (mm/dd/yyyy or dd/mm/yyyy - user should be able to change the format they want)
+○	From this, maybe we should add a timestamp, would be useful for time insights (e.g. invests mainly in evenings).
+●	Action - quite a few actions here that create a logic for what’s calculated in the rest of the tracker:
+○	Cash Deposit / Cash Withdrawal: required before entering a buy or sell transaction, as cash balances in dashboard depend on this.
+○	Buy
+○	Sell
+○	DRIP: dividend reinvestment plan for people that automatically buy stock with their dividends
+○	Cash dividends: dividends deposited into account cash balance
+○	Cash interest: if account has capabilities to earn interest on cash balances
+○	Crypto interest: some users might do cryptocurrency staking where they first buy it, but then stake it and earn interest on it. Basically free crypto quantities adding up as there’s usually no purchase price
+○	Cash fees: fees charged for account inactivities or yearly fees. Discounted from cash balances (different to buying or selling parcel commissions which go in another column)
+○	Free asset: many brokers give free stocks to people. This doesn’t have a purchase price nor is discounted from cash balances, as it was free. It adds them to their portfolio and adds it to the total portfolio market value. When sold, it’s all return obviously, from the price at which it was given. E.g. i got gopro stock for free at a price of $12. It then increases to $20 and i sell. Technically my gains are $8 but in reality, i got $20 for free.
+○	Transfer send / transfer deposit: when i have a stock and transfer it from a broker to another. This usually transfers the quantities in the gsheet, but it doesn’t transfer the info of the avg purchase price (cost basis). It would be good to ensure in teh web app/mobile app we include this feature. E..g i buy aapl in broker 1, i then transfer it to broker 2. Then i continue buying appl in broker 2. Ideally, the cost basis in broker 2 will include everything done  for the asset bought in broker 1, together with the rest of cost basis’ of broker 2.same with crypto. So far with crypto it has been fine as it’s just quantities but good to have that option for every asset.
+○	Happy to hear suggestions on other ‘actions’ to add in that column/field
+●	Asset Ticker: here people enter the asset ticker found in google finance. If we use yahoo finance, i presume we’ll need to have the tickers in that format. Ideally, when people search the ticker, it will show the available options to choose from. Critical to include international stocks/etf’s for sure. It would be amazing if we can include options here too. For options, most likely it would be a different entry fields as we’d need expiration date, etc. i do know options exist in yahoo finance, not sure about coingecko etc. This column will also depend whether we include the next one or not:
+●	Crypto Name: when a crypto is added in transactions (Bitcoin bought in USD), google finance has it as a ticker called BTCUSD. When it’s like that, it’s added in the asset ticker column. However, when its’ a random crypto not in google finance, like say solana, the user adds it in this crypto name column. What the gsheet does is it vlookups or index matches this crypto name into the crypto prices tab where i have a data table from cryptorates.ai where crypto prices are refreshed constantly, and the list is more extensive than google finance. Ideally for these 2 columns, we’ll have just one ticker entry and the web app/mobile app will search in the available list of api prices which asset to choose. Good to have this alternative just in case. Happy to get suggestions here on your knowledge of api’s and data availability. In stock events app, i’ve seen it’s just one field.
+●	Quantity: this one is simply, just the number of shares or quantity of crypto bought.
+●	Price: the price at which the asset was bought
+●	Fiat fees: how much the broker charged for buying/selling a parcel. E.g. i buy aapl, they charge me $5 extra for buying it (taken from the amount we bought the stock for. Similar to how Stake AU does it.
+○	Sometimes crypto fees are charged when buying/selling or even transferring. This hasn’t been accounted for in the tracker, but i would love to in the web app/mobile app. Currently, for wallet transfers, i simply instruct users to send x crypto, and deposit x crypto minus the crypto quantity there was in fees. Some crypto brokers charge actual fiat money as fees too. Should create options for this.
+●	Currency: given the multi currency capabilities of this tracker, an entry for this is how much e.g. usd was deposited, and how much in stock was bought with usd. There are brokers, like Stake US in australia, that make you change AUD to USD, then you buy the stock in USD. The app should have this capability to be tracked and give analysis on exchange rate / spread / fx fees lost.
+●	Platform, an entry of which platform you’re using in the transaction. Ideally this will like in a settings tab of the app, but it would be cool when users add this as a transaction, int he platform field they can see a form where they can choose their created platforms (brokers), or at the bottom to add a new one.
+●	Asset class: same as platform with same design
+●	Sector: same as platform with same design
+●	Country: same as platform with same design
+●	Strategy: same as platform with same design
+●	Maybe we need to add one more of account holder something like that. For couples who invest.
+○	All these descriptive fields are critical for insights in the dashboard/summary views in terms of filters that can be used to design the charts/graphs. Trading view style.
+●	Notes: free text for any note people might want to add in case they’re doing historical audit one day
+These above are all and the only manual entries. Pretty cool.
+
+The rest of the columns in the transactions are calculated fields, that aid in creating the rest of the tracker dashboards and summary tables. We’ve got:
+●	Total (local currency)
+●	Total (local currency )(Fees include)
+●	Total (universal currency) → connected to the currency their using in their system settings
+●	Total (universal currency) (fees included)
+
+As you can see here, ideally in the app’s dashboard we’ll have a dropdown with the currency they want to see their totals in. It will be critical to ensure all calculated fields have both a local currency and a universal currency, where we use the latest (or historical) exchange rate of the pair and convert it. This helps with people that invest in multiple currencies / locations and want to see their overall portfolio as a total in a single currency.
+
+The rest of the columns are automatically calculated as you can see. Would be good to also figure out what’s the amount of time since the person purchased that asset. This helps with tax calculation time. E.g. the aapl stock i bought in 2021, if it’s 2022 and i look at that row in 2021, i’d like to see how many days ago it was bought vs today. Call it days since purchase, something like that. Will help for report generating and filtering.
+
+All the other columns we can dive into later, however, these will mainly be in backend. Here’s where i’ll need you help in also creating fifo/lifo/avg calculations for cost basis, rolling quantities per asset, as well as anything else other web apps use. Many people have been asking questions about this, about the updated cost basis once they sell a stock. We’ll need some testing here.
+
+‘Settings’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=0#gid=0
+
+
+This mapping works for data validation, where users can enter whatever they want in each column and it will appear as a dropdown in the transactions options to fill up (brokerage account, country, strategy etc). It just helps keep manual input organised without typos. Up to your discretion whether to have a settings tab inside the app with this, or whether to have it all as an editable dropdown list in each field in the manual entry of transactions / csv upload. In csv upload, similar to the budget tracker, we’ll want users to have the option to also upload their brokerage transactions account via csv, where they can map the fields, and then fill up the empty gaps not available in their brokerage account, such as strategy, country, asset class, etc.
+
+
+‘SPLIT Tool’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=1233920096#gid=1233920096
+
+The SPLIT Tool is a combination of GSheets with a backend script. It essentially allows users to enter the SPLIT that occurred, and when a button is clicked the script analyses all historical transactions for the ticker and applies the mathematical split to the price and quantities purchased. SPLIT Script here: https://script.google.com/u/0/home/projects/1PsLC26V0GV65qr5_DrCBySXJEPxhUH7ddA7Azgz3i64FKKqpLBfUjJlR/edit
+
+‘Portfolio Performance’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=1495079980#gid=1495079980
+
+This tab essentially reads the total portfolio market value and takes a daily snapshot (or whatever sequence is chosen by the user through script triggers), to then create a record that then translates into a graph in the dashboard tab. This graph is critical to have in the web app / mobile app dashboard. Similar to most competitors like stock events, and brokerage platforms, where users can see how their investments have performed through time. This is also important to show when assets are sold or bought, so the graph shows a big jump. It would be also good to have a historical price chart graph of just the asset’s price, without the jumps of when people add/sell stocks. So 2 graphs in the insights of portfolio tracker, one that’s related to the investments of the person and market value, and another similar to Stake AU trading platform where it just shows how the asset price has moved in 1hr, 7 days, 1 month etc. similar to Google Finance charts when you search for a stock/etf/currency pair.
+
+Script for this tab is here under Portfolio Performance tab: https://script.google.com/u/0/home/projects/1PsLC26V0GV65qr5_DrCBySXJEPxhUH7ddA7Azgz3i64FKKqpLBfUjJlR/edit
+
+‘Crypto Prices’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=1088968819#gid=1088968819
+
+This tab was explained before in the Transactions, it serves as a failsafe if the crypto price doesn’t exist in google finance. It simply does and index match with the name entered by the user, and in the dashboards/portfolio summary views it shows the latest price for that asset that’s then multiplied by their quantities and compared against cost basis for p/l insights. I think this won’t  be needed in the app as long as we find an API for crypto that we can join to the coingecko or yahoofinance api. Ideally all prices are automatically shown to users. This section has caused a lot of issues with the gsheets, as people constantly ask me why the ticker they entered doesn’t have a price. Keen to hear your suggestions about optimising live price fetching with api’s for stocks, crypto, etf’s not only in the US but international. Free api ideally or pay as you go depending on “Calls”.
+
+The crypto prices tab is just populated from a website called cryptorates.ai. Main gsheet where this is done is here: https://docs.google.com/spreadsheets/d/1Ll8KadIH2abIlsdJQ6UkxB7hUPxrJaFGndTrAFRP47Q/edit?gid=1122613972#gid=1122613972
+As you can see, i’m just importing the data this way:
+=IMPORTDATA("https://cryptorates.ai/files/standard.csv")
+
+‘Portfolio Rebalancing’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=1876916867#gid=1876916867
+
+Very simple tab that adds up what’s the total market value of your portfolio, and shows the share each ticker has out of that total. The user then adds an entry of what’s the ideal share they would like, and the tracker recommends which is the next purchase based on the requirements to reach the ideal share mix the user wants.
+
+‘Dividends’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=150362752#gid=150362752
+
+Stock events does a really good dividends insights dashboard. Ideally it will show awesome insights like stock events where it shows historical dividends, but also projected dividends based on the expected dividend payout of each ticker the user owns. We’ll need to get this info from the api i presume. So if the user has 5 shares of x stock, the app should know how much dividends to expect in the next payout, or also analyse the historical ones for that quarter/year and project what’s expected for the next month, quarter, year.
+
+‘Individual Assets’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=324794061#gid=324794061
+
+This tab is quite similar to Portfolio by Platform or Total Portfolio. It ultimately summarises all the transactions into a unique list of platform, ticker, quantities, cost basis, market value to show a summary of the performance of each. It’s really cool because it separates out if you have the same stock or crypto in different platforms. So you can see the insights separately.
+
+‘Portfolio by Platform’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=1591956570#gid=1591956570
+
+Similar to the other aggregator tabs, this one shows the assets in a specific portfolio chosen. Imagine a filter when you can select your assets across the whole portfolio, or sometimes you might want to analyse only one platform and the assets in it. Ideally, all the insights will be sliced / filtered into that platform chosen from the filter.
+
+‘Total Portfolio’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=865206497#gid=865206497
+
+This one is the main summary table that combined similar features to the individual assets and portfolio by platform tabs and ultimately shows a list of unique assets, no matter the platform, so you can see total amounts, avg cost basis across the platforms, total market value, p/l and qualitative information added in the transactions like sector, asset class, country etc. I think these 3 tabs can be created into one with enough filters, in the app.
+
+‘Dashboard’ tab: https://docs.google.com/spreadsheets/d/1nC7GWjRnlRdf05zcduWhhLDWja-IUO1famRDSa5V8gM/edit?gid=968651022#gid=968651022
+
+Original Script used for the creation of the Demonstration video of this portfolio tracker: (adding this here to provide even more context on features and capabilities of this tool I want in the web app / mobile app). I’ll do something similar for the Budget Tracker and the Debt Tracker when it comes time to design them, similarly to this one.
+
+<start of script>
+
+“Script - 26. Portfolio Tracker 3G
+
+—- INTRO —-
+
+This is the Portfolio Tracker - 3rd Generation - by Planet Finance. A tool that helps you track stocks, ETFs and crypto from multiple accounts and platforms; all in one place. It includes top quality features to capture insights; from a summary of your overall portfolio performance to your individual investments and your dividends. All presented through beautifully designed dynamic charts and tables. 
+
+There’s a range of useful tools that can be found here:
+
+For example, this SPLIT Tool to perform asset splits automatically on your past transactions. 
+
+There’s a Portfolio Rebalancing tool where you can set target weights and get signals for upcoming recommended purchases. 
+
+There’s also a charming dividends dashboard, where you can see the distribution of your dividends by month, asset class, sector, and geography.
+
+This dynamic table shows all your individual assets by platform and several interesting performance indicators and statistics.
+
+To drill down further, this view allows you to look at your investments by specific platform, to understand the allocation in each account and their performance.
+
+Then there’s a summary of all your grouped investments shown as a Total Portfolio, which provides the opportunity to look at granular data in a way that it’s easy to understand and allows you to play around with. Oh, and it has trendy charts which can be customised.
+
+This then automatically feeds into this user-friendly dashboard, where you can get a summary of your total portfolio performance, screen watchlist assets, and understand the distribution of your investments across many types of categories. 
+
+It doesn’t stop there! As you scroll down there’s a massive graph visualising your historical portfolio performance over time, with customisable date ranges. 
+And at the bottom, you’ll have 3 summary tables that break down your cross-platform movements with dividends, crypto and cash interest, cash balances, performance and trade information.
+
+Finally, let’s not forget the magic cell in the dashboard, that converts all your numbers in this tracker to an overall currency of your choice (magic internet money). This certifies precision and consistency when investing in multiple currencies and countries.
+—- EXAMPLE —-
+
+Now, let me show you an example on how to enter your investments in this tracker:
+
+This here is the backbone of this tracker, the Transactions tab. It requires minimal manual input and once you enter all the relevant information here, it is then translated into a lovely story through the rest of the tracker.
+
+I’ve populated this tab with hypothetical transactions using platforms from multiple countries and currencies, so you can see how anyone in the world could use this tool to track their investments. Transactions include options to enter: cash deposits, buy and sell orders, cross-platform transfers, cash dividends and reinvestment plans, crypto and cash interest, splits, and cash withdrawals.
+
+So let’s buy a new stock.
+
+First, you must enter the cash deposit into your account.
+
+Now, you can enter the stock purchase information. Let’s go with Waste Management in the US.
+
+Start with the purchase date, the action, in this case Buy, the ticker, in this case WM is just fine as it’s traded in the NY stock exchange, but if you’re trading in other exchanges it’s recommended you include the exchange symbol like this.
+
+Then the quantity, the price, currency, platform, asset class, sector, country, strategy and a note. (HEHEHE)
+
+And that’s it. If you move across the tabs, you can see that Waste Management has been added automatically to your tables and charts. 
+
+It’s a very intuitive way to enter transactions and the tracker delivers the perfect opportunity for you to seamlessly manage your investments successfully. 
+
+If you would like to access this ready-to-use tracker in light, dark, matrix, and, cyber punk theme, make sure to visit my Patreon, which is linked in the description of this video. 
+
+
+
+
+
+
+
+
+—- SET-UP —-
+
+When you first access this tracker, the first thing you’ll see is a protected version. You need to click ‘file’ on the top left and then make a copy into your private account. Now you can edit and continue with the set-up. 
+
+Go to the Transactions tab and select all the dummy transactions. Once they’re selected, remove them by pressing the backspace or delete key. You can do the same with the SPLIT Tool records and the Portfolio Rebalancing targets. 
+
+Go to the ‘Settings’ tab and check the options available under each column. These lists will appear as dropdown options as you enter transactions in the Transactions tab. Here you can enter your platforms being used and further asset classes, sectors or strategies you want to track. Make sure to enter your base currency in cell H5 to ensure the historical portfolio performance chart stays accurate if you have investments in multiple currencies.
+
+You can now start entering your transactions or migrate them from a previous tracker by pasting them from row 3 in the corresponding columns. 
+
+Once you’ve entered your transactions, there is one last step to set-up the historical portfolio performance chart in the dashboard:
+
+Go to the 'Portfolio Performance' tab and clean up the existing records. Select the records from A9 all the way to the bottom of column B and press the 'Backspace' or 'Delete' key. 
+
+To set-up the automation for recording data Click 'File' on the top left and go to 'Settings'. Double check that the spreadsheet settings are set to your desired location and time zone.
+
+Then Click 'Extensions' in the Menu Bar and go to 'Apps Script'.
+
+Click the alarm symbol on the left menu bar called 'Triggers'.
+
+Now Click the 'Add Trigger' button on the bottom right of the screen.
+
+Select 'recordPortfolioValue' from the list of functions to run and then Select the options in the event source. Choose 'Time-driven'.
+
+Then choose your desired time type and interval in the last 2 options. This will be the automatic trigger that will record your portfolio value and you'll be able to see the results in a list and also a chart in the 'Dashboard' as more records are created. I’ll go with weekly every Friday from 4 to 5pm.
+
+
+When you click save, Google will pop-up a new window with an authorisation page. This is to validate that you’re giving permission to an unofficial script made by Planet Finance.
+
+Choose your account, click Advanced, and then click “Go to Planet Finance Script (unsafe). I’ve developed this script and the only operation it performs is taking a snapshot of your portfolio value and pasting it within your private tracker. I cannot see this information as this is all being done in the copy of the tracker you made in your account. Finally, click Allow and your trigger will be saved. You can now close the Script window. 
+
+It's now ready for the trigger to start working at the next time and interval that you set up. There's also a button to manually record it in the Menu Bar called 'Record Portfolio Value' should you wish to test it straight away.
+
+
+And that is it! If you have any further enquiries feel free to read the instructions tab or contact me through all the available methods provided below. Thank you very much!
+“
+<end of script>
+
+—-----------------------------------------------
+
+
+This essentially summarises everything i just explained, into a clean dashboard that shows total market value, total cost, total p/l, top and bottom performers, charts and graphs on portfolio performance, on each platform, on each asset, a summary table of how money is distributed by platform, and also a small crypto table that shows where your crypto is distributed across platforms or (“wallets”). 
+
+Feel free to ask any questions about the formulas inside each tab and how things are currently calculated. I’m not sure if we’re applying the actual business logic at this stage, but good to keep in context at least for this upcoming sprint and when it comes to time of adding filters, business logics, calling data from api’s etc. It’s a huge job and i want to make sure all the capabilities (And more) from this tracker are included in both the web app and the mobile app. Let’s do it step by step. Anyways, hope this is informational for the Field, type and purpose table plus everything else that follows.
+
+Let me know if you can access each of these links, happy to make a copy and give you edit access, to be able to check formulas inside the google sheet if it’s not possible on view mode.
+
+

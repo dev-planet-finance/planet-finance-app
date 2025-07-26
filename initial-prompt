@@ -1,0 +1,129 @@
+I want to create my own web app and then mobile app, just like delta by etoro or stock events but with extra features. Apps I’m using as an example: (https://delta.app/en) & (https://stockevents.app/en). 
+I have this business called Planet Finance, where I create personal finance Google Sheet templates and sell them to customers online. These templates are assets that ultimately automate a lot of the analytics users can see about their financial performance related to investing, budgeting, debt management and overall net worth analysis. 
+
+It's a side hustle I've had for a couple of years now, where I create Google Sheet templates and sell them online. These templates basically target personal finance problems that are solved automatically. All you need is to enter transactions manually in a tab, and all other tabs automatically calculate insights, and the user can slice the data using several dropdown menus serving as filters. Examples are: the budget tracker, debt tracker, portfolio tracker. They are complex, as they have GOOGLEFINANCE functions to retrieve live currency, stock or crypto prices, to provide the user a capability to see live portfolio performance, performance in different currencies, and even analyse historical FX changes. I've reached the point where Google Sheets isn't enough. It's a lot of formulas to automate everything and Gsheets is not giving me enough computing power to create what I want. 
+
+As you can see in my website (planetfinance.info), I sell the google sheet templates there. 
+How can I actually build these same tools into an app, I guess similar to the Stock Events / delta by etoro app, where we can connect manual transactions into live prices of stocks or currencies to track portfolio movements? I think, it's time to create a web and app solution that transfers all my work and knowledge to something more user friendly. Ideally I'd have a website, and an app available to download the tool via app store and google play. Here's where I'll need your help. I have no experience coding (just know sql and python) for a website or an app, nor any clue about data cloud systems and maintenance of these things. No idea how to publish the apps in their respective app stores either. I want something similar to stock events and delta, but also adding my other tools such as budget tracker, and debt tracker. ULTIMATELY, I want my website and apps to look like this: 
+Dashboard: Main place where people can choose between portfolio, budget, debt or overall net worth which combines these 3.
+Portfolio tracker: 
+- ability to manually add number of shares, price bought for, date, fees (in % of $), a note, region, investment type (etf, crypto, stock), industry, broker you bought it with/sold with, and the ability to do buy, sell, dividend or transfer them to another broker. also it needs a feature to deduct the cost of buying an asset from your cash balances. the cash balances are a separate button (like delta), where you add cash deposits (or withdrawals) to then use it to buy assets.
+
+- this also needs to be adjusted to allow importing external brokerage account transactions and letting the user create the relevant fields for the app to ingest the data. ideally we would provide a csv template that users can download (or get sent to their account email) where they can enter the information of their bulk purchases, and upload them into the website/future app.
+
+- This section of the app will need dashboards that show performance by investment, by total portfolio, region etc.
+
+budget tracking: 
+- ability to enter transactions manually on income and expenses by account, category, currency of that account, transfers between accounts, and international transfers (similar to the budget tracker). similarly, would like the user to have the ability to slice their data by year, month, quarter etc. 
+
+debt tracker: 
+- would love to include the debt tracker capabilities here too - where users can add their loans with amount, interest rate, and an amortization table is generated. additionally, we would need to figure out a way to calculate variable interest loans maybe from the debt tracker debt repayment categories and back calculating it. e.g. in month 2 i spent 525.23 usd in mortgage repayments, therefore, that means my interest is x%. 
+
+finally, the networth tracker:
+- something that joins the portfolio, the budget and the debt tracker. where the user will be able to see where's their money allocated, and they can see the "deposited amount" totals, as well as the live prices amounts. 
+
+I know it's a huge task, so happy to take it step by step with your assistance, so that in the next couple of months we can build something robust for my next phase of PF. 
+one more thing: No need to connect to bank accounts or have any weird compliance agreements to extract prices. I just want to connect to the internet to grab some live prices of stocks and currency pairs to connect to all the user manual inputs. the rest is just logic built within the code. I really want to use ai to build this, as it would take years for me to do it line of code by line... 
+
+so, here's what we're going to do in terms of tech full stack.
+- document everything in github - always push changes when a sprint is finished
+- railway.com. postgres sql database
+- vercel.com with next.js
+- firebase authenticator for users to create an account
+- eodhd api key (Free for mvp) for stocks, etfs, etc. coingecko for now for crypto.
+- stripe payments for pro version (post mvp launch). e.g. if people want to track more assets or insights, pay subscription.
+
+I already have accounts with all of these. I initially tried building it with Chatgpt Pro, where it would send me instructions on what to install, which terminal codes to run, which codes to enter in vs code, testing transactions in postman, and checking in localhost to see the results. However, the memory of chatgpt is very bad and it would send me on hours of error loops and delete/redo codes that didn’t need to be touched. It had no memory of the folder system in vs code and it just made a mess. I really like the infrastructure/full stack tech we chose, so happy to continue with these and I’ll just create new projects to connect everything we do in windsurf there.
+This is a very important project that needs to be created with the utmost professionalism, as it will be used by thousands of users and I plan to scale it to cover all areas of the world. I’m using Zoho mail and created a dev email to sign up to everything (developer@planetfinance.info), and the only place where I created an account with a different email was firebase authentication, as it’s a google product and it required me to use my gmail for planet finance (planetfinanceofficial@gmail.com). I don’t wan’t to touch any of the old code or postgres tables or firebase projects or vercel projects I created. So moving forward everything will be called planet-finance-app. Can you confirm we won’t delete anything anywhere, and we’ll start from scratch? I’ll follow instructions about creating new projects in Github,firebase, railway and vercel to avoid any confusion. I’m sure this is okay? I’m paying for chatgpt pro, and railway hobby so far. When testing, we’ve been using localhost4000 for backend and localhost3000 for backend. Is it an issue if we use the same? Will it break the old work I did? Maybe we can do localhost 1000 or 2000, up to your best recommendation. I already have a domain bought in NameCheap to then connect this to it so anyone in the world can access it, join and start using.
+Based on my experience the last month with chatgpt and its guidance, it got very confused with doing a portfolio tracker, a budget tracker, a debt tracker and a networth tracker. So I’m happy to start just with the necessary things (login, register, database tables, backend, frontend) for the portfolio tracker first. This is a good step because we want all the capabilities from delta and stock events, and then on top of that add budget tracker, debt tracker and networth tracker.
+So, follow the following steps for building each aspect of the Web App:
+1.	Confirm all softwares and full stack tech is ready (accounts set up, projects created, softwares downloaded)
+2.	Test connections to these tech stacks. E.g. pushing to github, making sure backend frontend are connected, etc.
+3.	Create database schema
+4.	Create sql script to create all necessary tables in postgres database
+5.	Add initial test data to ensure it all works well in database
+6.	Backend, set-up node.js backend for project structure
+7.	Send test data to ensure backend is populating
+8.	Return test data to view and verify it looks correct
+9.	Define API endpoints (CRUD) creating routes. For example creating a new transaction, such as buy asset, or creating a new portfolio (multiple portfolios can be tracked – e.g aapl and tsla in portfolio 1, then cat and txn in portfolio 2, allowing you to look at them separately or at a combined view like in delta).
+10.	Test endpoints
+11.	React frontend structure
+12.	Set up CORS for backend / frontend to talk in a secure way
+13.	Setup basic api services (eodhd, coingecko, tailwind 3 css with shadCN for frontend design)
+14.	Test test and test. Once happy, can release to vercel domain or even namecheap domain.
+
+For your understanding, read the brief of the Portfolio Tracker first here (/Users/planetfinance/planet-finance-app/portfolio-tracker-brief), so you can see how it works in planet finance, and which capabilities we want in there. Additionally, I’ll explain my desired transactions format below:
+Portfolio tab:
+First transaction, either adding an asset, or adding cash to the account. Can do it through a manual transaction (nice UI with required fields), one by one, or upload a template csv for bulk uploads. Fields it should have:
+Cash Transaction: (choose from the top whether it’s a deposit or a withdrawal)
+-	Currency
+-	Date and Time
+-	Amount
+-	Platform
+-	Notes
+Asset Transaction:
+-	When adding or selling an asset, it will appear as a search function first. We’ll need to search it in the list of available assets from eodhd and coingecko. So if I search BTC, I’m expecting to see bitcoin, and probably other random stocks around the world also named BTC. In this search function we’ll want to see things like a name and the exchange where they’re traded (unless crypto which is global). Once I clik the asset, then it takes me to the transaction UI to add purchase details.
+-	Choose from the top whether it’s a buy, sell, transfer or dividend. 
+-	Options then change based on the action.
+o	Buy:
+	Broker used to buy it
+	Date and time
+	Buy price (either per unit or in total)
+	Quantity bought (# of shares)
+	Fee (in currency or as a %)
+	Button to choose whether to deduct it from available cash balance in that portfolio or not
+	Optional free text entry:
+•	Asset Class
+•	Sector
+•	Country
+•	Strategy
+	Notes
+o	Sell:
+	Broker used to sell it
+	Date and time
+	Sell price (either per unit or in total)
+	Quantity sold (# of shares)
+	Fee (in currency or as a %)
+	Button to choose whether to add it to available cash balance in that portfolio or not
+	Optional free text entry:
+•	Asset Class
+•	Sector
+•	Country
+•	Strategy
+	Notes
+o	Dividend (can be DRIP or cash dividend option)
+	DRIP or cash dividend button
+	Broker where dividend was received
+	Date and time
+	Dividend amount (if cash dividend) / number of shares (if DRIP)
+	Asset price (if DRIP)
+	Fee (in currency or as a %)
+	Button to choose whether to add it to available cash balance in that portfolio or not (drip shouldn’t show this as it goes straight into adjusting number of shares user holds)
+	Optional free text entry:
+•	Asset Class
+•	Sector
+•	Country
+•	Strategy
+	Notes
+o	Transfer
+	From (broker entry)
+	To (broker entry)
+	Amount transferred (quantity or shares)
+	Date and time
+	Fee (in currency, in asset quanqity or as a %)
+	Optional free text entry:
+•	Asset Class
+•	Sector
+•	Country
+•	Strategy
+	Notes
+All these transactions should be able to be accesed by the user if they want to edit them. If EODHD has dividends per share in their API, I think we could still have the dividend transction as an option, but ideally the dividend amount will be calculated based on the number of shares the user has and what EPS was announced/paid out by the company.
+Remember, with these entries by users, we need to be able to calculate:
+-	Cumulative number of shares, total cost, market value, gains, roi %, fees, dividends, avg purchase price, avg selling price, number of transactions, and current market price.
+Currency is very important here. Because if I buy AAPL in USD but I’m curious how all these transactions and info are worth in GBP or AUD, we need to have a function that converts everything based on the latest exchange rate of that currency pair. 
+
+Portfolio Dashboard: a section where you can see all your assets, combined or per portfolio. Additionally it will be critical to have lovely time series graphs, as well as filtering capabilities in summary tables and of course charts with market value or cost broken down by asset class, sector, country, strategy or notes the user might have added.
+We can define other interesting insights further down the track when we can see it in frontend.
+Once we nail the portfolio tracker, we can move on to the budget tracker and debt tracker and final net worth dashboard. We can figure out organising the web app tabs properly (with different section for each “tracker” as necessary down the line). IE, I expect there to be potentially a transactions tab at the bottom, where it has 3 sections and the user can either go to the portfolio, budget or debt tracker to enter its transactions. Something like that. Happy to brainstorm more about it.
+
+So, that’s a very long prompt. Let me know what are your thoughts, and let’s begin with the actual tech stack set up to ensure I’m using new pages/new projects and folders in all the softwares so that we don’t delete my draft from the other one I built with chatgpt. After that is done, we can begin with the schema design based on what I’ve sent. Remember to build everything to be scaled to a proper app that can have a freemium model, accessed from anywhere around the world for global consumers.
