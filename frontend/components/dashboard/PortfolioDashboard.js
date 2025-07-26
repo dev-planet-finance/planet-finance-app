@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { portfolioService, transactionService, priceService } from '../../lib/api';
+import { portfolioAPI, transactionAPI, priceAPI } from '../../lib/api';
 import ThemeToggle from '../ui/ThemeToggle';
 
 export default function PortfolioDashboard() {
@@ -40,7 +40,8 @@ export default function PortfolioDashboard() {
       setError('');
       console.log('🔄 Loading portfolios for user:', currentUser?.uid);
       
-      const portfoliosData = await portfolioService.getAll();
+      const response = await portfolioAPI.getPortfolios();
+      const portfoliosData = response.data;
       console.log('📊 Portfolios loaded:', portfoliosData);
       setPortfolios(portfoliosData);
       
@@ -58,7 +59,8 @@ export default function PortfolioDashboard() {
 
   async function loadTransactions(portfolioId) {
     try {
-      const transactionsData = await transactionService.getByPortfolio(portfolioId);
+      const response = await transactionAPI.getTransactions(portfolioId);
+      const transactionsData = response.data;
       setTransactions(transactionsData);
     } catch (err) {
       console.error('❌ Error loading transactions:', err);
@@ -70,7 +72,8 @@ export default function PortfolioDashboard() {
     
     try {
       setIsSearching(true);
-      const results = await priceService.search(searchQuery);
+      const response = await priceAPI.searchAssets(searchQuery);
+      const results = response.data;
       setSearchResults(results.slice(0, 10)); // Limit to 10 results
     } catch (err) {
       console.error('❌ Search error:', err);
@@ -83,16 +86,17 @@ export default function PortfolioDashboard() {
     try {
       if (!selectedPortfolio) {
         // Create default portfolio if none exists
-        const newPortfolio = await portfolioService.create({
+        const response = await portfolioAPI.createPortfolio({
           name: 'My Portfolio',
           description: 'Default portfolio',
           currency: 'USD'
         });
+        const newPortfolio = response.data;
         setPortfolios([newPortfolio]);
         setSelectedPortfolio(newPortfolio);
       }
 
-      await transactionService.create({
+      await transactionAPI.createTransaction({
         ...newTransaction,
         portfolio_id: selectedPortfolio.id,
         quantity: parseFloat(newTransaction.quantity),
