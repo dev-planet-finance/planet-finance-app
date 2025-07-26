@@ -286,73 +286,81 @@ export default function PortfolioDashboard() {
                   </div>
                   
                   {showAddTransaction && (
-                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">Add New Transaction</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Symbol</label>
-                          <input
-                            type="text"
-                            value={newTransaction.symbol}
-                            onChange={(e) => setNewTransaction({...newTransaction, symbol: e.target.value.toUpperCase()})}
-                            placeholder="AAPL, BTC, etc."
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
-                          />
+                    <div className="mb-6 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-6">Add New Transaction</h4>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Symbol</label>
+                            <input
+                              type="text"
+                              value={newTransaction.symbol}
+                              onChange={(e) => setNewTransaction({...newTransaction, symbol: e.target.value.toUpperCase()})}
+                              placeholder="AAPL, BTC, etc."
+                              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Action</label>
+                            <select
+                              value={newTransaction.action}
+                              onChange={(e) => setNewTransaction({...newTransaction, action: e.target.value})}
+                              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                            >
+                              <option value="buy">Buy</option>
+                              <option value="sell">Sell</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
+                            <input
+                              type="number"
+                              step="0.00001"
+                              value={newTransaction.quantity}
+                              onChange={(e) => setNewTransaction({...newTransaction, quantity: e.target.value})}
+                              placeholder="Number of shares/units"
+                              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per Share</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={newTransaction.price}
+                              onChange={(e) => setNewTransaction({...newTransaction, price: e.target.value})}
+                              placeholder="Price per share"
+                              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Transaction Date</label>
+                            <input
+                              type="date"
+                              value={newTransaction.date}
+                              onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})}
+                              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Action</label>
-                          <select
-                            value={newTransaction.action}
-                            onChange={(e) => setNewTransaction({...newTransaction, action: e.target.value})}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
-                          >
-                            <option value="buy">Buy</option>
-                            <option value="sell">Sell</option>
-                          </select>
+                        
+                        {/* Action Buttons - Always Visible */}
+                        <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+                          <div className="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                            <button
+                              onClick={() => setShowAddTransaction(false)}
+                              className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={addTransaction}
+                              className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-semibold"
+                            >
+                              💾 Save Transaction
+                            </button>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
-                          <input
-                            type="number"
-                            step="0.00001"
-                            value={newTransaction.quantity}
-                            onChange={(e) => setNewTransaction({...newTransaction, quantity: e.target.value})}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={newTransaction.price}
-                            onChange={(e) => setNewTransaction({...newTransaction, price: e.target.value})}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                          <input
-                            type="date"
-                            value={newTransaction.date}
-                            onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white"
-                          />
-                        </div>
-                      </div>
-                      <div className="mt-4 flex space-x-3">
-                        <button
-                          onClick={addTransaction}
-                          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                          Save Transaction
-                        </button>
-                        <button
-                          onClick={() => setShowAddTransaction(false)}
-                          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          Cancel
-                        </button>
                       </div>
                     </div>
                   )}
