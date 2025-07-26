@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function DashboardLayout({ children, activeTab, setActiveTab }) {
   const { user, logout } = useAuth();
