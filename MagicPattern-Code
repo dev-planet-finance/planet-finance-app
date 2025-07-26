@@ -1,0 +1,1934 @@
+// See Magic pattern files and codes used below: it's a total of 4 files. I expect you to use a similar layout in the planetfinance app.
+
+// App.tsx:
+
+import React, { useState, Component } from 'react'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom'
+import {
+  ChevronDownIcon,
+  MoonIcon,
+  SunIcon,
+  UserIcon,
+  BellIcon,
+  LogOutIcon,
+  SettingsIcon,
+  LineChartIcon,
+  PieChartIcon,
+  EyeIcon,
+  ArrowLeftIcon,
+  PlusIcon,
+  XIcon,
+  CheckIcon,
+} from 'lucide-react'
+// Planet Finance App - Main Application
+const App = () => {
+  const [darkMode, setDarkMode] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode)
+  }
+  return (
+    <Router>
+      <AppContent
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        userMenuOpen={userMenuOpen}
+        setUserMenuOpen={setUserMenuOpen}
+      />
+    </Router>
+  )
+}
+const AppContent = ({
+  darkMode,
+  toggleDarkMode,
+  userMenuOpen,
+  setUserMenuOpen,
+}) => {
+  const location = useLocation()
+  const currentPath = location.pathname
+  return (
+    <div
+      className={`min-h-screen w-full ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}
+    >
+      {/* Navigation Header */}
+      <header
+        className={`w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} shadow-sm`}
+      >
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <div
+              className={`h-10 w-10 rounded-full ${darkMode ? 'bg-indigo-500' : 'bg-indigo-600'} flex items-center justify-center`}
+            >
+              <span className="text-white font-bold text-xl">P</span>
+            </div>
+            <span className="ml-2 font-bold text-xl">Planet Finance</span>
+          </div>
+          {/* Main Navigation */}
+          <nav className="hidden md:flex space-x-1">
+            <NavLink
+              to="/overview"
+              active={currentPath === '/overview'}
+              darkMode={darkMode}
+            >
+              Overview
+            </NavLink>
+            <NavLink
+              to="/portfolios"
+              active={currentPath === '/portfolios'}
+              darkMode={darkMode}
+            >
+              Portfolios
+            </NavLink>
+            <NavLink
+              to="/transactions"
+              active={currentPath === '/transactions'}
+              darkMode={darkMode}
+            >
+              Transactions
+            </NavLink>
+            <NavLink
+              to="/watchlists"
+              active={currentPath === '/watchlists'}
+              darkMode={darkMode}
+            >
+              Watchlists
+            </NavLink>
+          </nav>
+          {/* User Controls */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+            >
+              {darkMode ? <SunIcon size={20} /> : <MoonIcon size={20} />}
+            </button>
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className={`flex items-center space-x-1 p-2 rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              >
+                <UserIcon size={20} />
+                <ChevronDownIcon size={16} />
+              </button>
+              {userMenuOpen && (
+                <div
+                  className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-10 ${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}
+                >
+                  <UserMenuItem
+                    icon={<UserIcon size={16} />}
+                    text="Account"
+                    darkMode={darkMode}
+                  />
+                  <UserMenuItem
+                    icon={<BellIcon size={16} />}
+                    text="Notifications"
+                    darkMode={darkMode}
+                  />
+                  <UserMenuItem
+                    icon={<SettingsIcon size={16} />}
+                    text="Settings"
+                    darkMode={darkMode}
+                  />
+                  <UserMenuItem
+                    icon={<LogOutIcon size={16} />}
+                    text="Sign out"
+                    darkMode={darkMode}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+      {/* Mobile Navigation */}
+      <div
+        className={`md:hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+      >
+        <div className="flex justify-around">
+          <MobileNavLink
+            to="/overview"
+            active={currentPath === '/overview'}
+            darkMode={darkMode}
+          >
+            Overview
+          </MobileNavLink>
+          <MobileNavLink
+            to="/portfolios"
+            active={currentPath === '/portfolios'}
+            darkMode={darkMode}
+          >
+            Portfolios
+          </MobileNavLink>
+          <MobileNavLink
+            to="/transactions"
+            active={currentPath === '/transactions'}
+            darkMode={darkMode}
+          >
+            Transactions
+          </MobileNavLink>
+          <MobileNavLink
+            to="/watchlists"
+            active={currentPath === '/watchlists'}
+            darkMode={darkMode}
+          >
+            Watchlists
+          </MobileNavLink>
+        </div>
+      </div>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        <Routes>
+          <Route
+            path="/overview"
+            element={<OverviewPage darkMode={darkMode} />}
+          />
+          <Route
+            path="/portfolios"
+            element={<PortfoliosPage darkMode={darkMode} />}
+          />
+          <Route
+            path="/transactions"
+            element={<TransactionsPage darkMode={darkMode} />}
+          />
+          <Route
+            path="/watchlists"
+            element={<WatchlistsPage darkMode={darkMode} />}
+          />
+          <Route path="*" element={<Navigate to="/overview" replace />} />
+        </Routes>
+      </main>
+    </div>
+  )
+}
+// Navigation Components
+const NavLink = ({ to, children, active = false, darkMode }) => (
+  <a
+    href={to}
+    className={`px-4 py-2 rounded-md font-medium ${active ? (darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900') : darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'} transition-colors duration-200`}
+  >
+    {children}
+  </a>
+)
+const MobileNavLink = ({ to, children, active = false, darkMode }) => (
+  <a
+    href={to}
+    className={`px-4 py-3 text-center font-medium ${active ? (darkMode ? 'border-b-2 border-indigo-500 text-white' : 'border-b-2 border-indigo-600 text-gray-900') : darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+  >
+    {children}
+  </a>
+)
+const UserMenuItem = ({ icon, text, darkMode }) => (
+  <a
+    href="#"
+    className={`flex items-center px-4 py-2 text-sm ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'}`}
+  >
+    <span className="mr-2">{icon}</span>
+    {text}
+  </a>
+)
+// Page Components
+const OverviewPage = ({ darkMode }) => {
+  // Mock data for portfolio value over time
+  const portfolioData = [
+    {
+      date: 'Jan',
+      value: 10000,
+    },
+    {
+      date: 'Feb',
+      value: 12000,
+    },
+    {
+      date: 'Mar',
+      value: 9800,
+    },
+    {
+      date: 'Apr',
+      value: 11500,
+    },
+    {
+      date: 'May',
+      value: 13200,
+    },
+    {
+      date: 'Jun',
+      value: 14100,
+    },
+    {
+      date: 'Jul',
+      value: 15800,
+    },
+  ]
+  // Mock data for detailed line chart
+  const detailedChartData = [
+    {
+      date: '1',
+      value: 10000,
+    },
+    {
+      date: '5',
+      value: 10200,
+    },
+    {
+      date: '10',
+      value: 10500,
+    },
+    {
+      date: '15',
+      value: 10300,
+    },
+    {
+      date: '20',
+      value: 10800,
+    },
+    {
+      date: '25',
+      value: 11200,
+    },
+    {
+      date: '30',
+      value: 11500,
+    },
+  ]
+  // Mock data for assets
+  const assets = [
+    {
+      name: 'Apple Inc.',
+      symbol: 'AAPL',
+      shares: 15,
+      price: 178.72,
+      value: 2680.8,
+      cost: 2200,
+      gain: 480.8,
+      gainPercent: 21.85,
+    },
+    {
+      name: 'Microsoft Corp.',
+      symbol: 'MSFT',
+      shares: 8,
+      price: 403.78,
+      value: 3230.24,
+      cost: 2800,
+      gain: 430.24,
+      gainPercent: 15.37,
+    },
+    {
+      name: 'Amazon.com Inc.',
+      symbol: 'AMZN',
+      shares: 12,
+      price: 178.15,
+      value: 2137.8,
+      cost: 1900,
+      gain: 237.8,
+      gainPercent: 12.52,
+    },
+    {
+      name: 'Tesla Inc.',
+      symbol: 'TSLA',
+      shares: 10,
+      price: 177.67,
+      value: 1776.7,
+      cost: 2000,
+      gain: -223.3,
+      gainPercent: -11.17,
+    },
+    {
+      name: 'Nvidia Corp.',
+      symbol: 'NVDA',
+      shares: 5,
+      price: 950.02,
+      value: 4750.1,
+      cost: 3800,
+      gain: 950.1,
+      gainPercent: 25,
+    },
+  ]
+  const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0)
+  const totalCost = assets.reduce((sum, asset) => sum + asset.cost, 0)
+  const totalGain = totalValue - totalCost
+  const totalGainPercent = (totalGain / totalCost) * 100
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold mb-4">Portfolio Overview</h1>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <SummaryCard
+            title="Total Value"
+            value={`$${totalValue.toLocaleString()}`}
+            darkMode={darkMode}
+          />
+          <SummaryCard
+            title="Total Cost"
+            value={`$${totalCost.toLocaleString()}`}
+            darkMode={darkMode}
+          />
+          <SummaryCard
+            title="Total Gain/Loss"
+            value={`$${totalGain.toLocaleString()}`}
+            change={totalGainPercent}
+            darkMode={darkMode}
+          />
+          <SummaryCard
+            title="Assets"
+            value={assets.length.toString()}
+            darkMode={darkMode}
+          />
+        </div>
+      </div>
+      {/* Detailed Line Chart */}
+      <div
+        className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Performance (July)</h2>
+          <div className="flex space-x-2">
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+            >
+              1M
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}
+            >
+              3M
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}
+            >
+              6M
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}
+            >
+              1Y
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}
+            >
+              All
+            </button>
+          </div>
+        </div>
+        <div className="h-64 w-full relative">
+          {/* Line Chart */}
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 50"
+            preserveAspectRatio="none"
+          >
+            <path
+              d={`M0,${50 - (detailedChartData[0].value - 10000) / 30} 
+                  L${100 / 7},${50 - (detailedChartData[1].value - 10000) / 30} 
+                  L${200 / 7},${50 - (detailedChartData[2].value - 10000) / 30} 
+                  L${300 / 7},${50 - (detailedChartData[3].value - 10000) / 30} 
+                  L${400 / 7},${50 - (detailedChartData[4].value - 10000) / 30} 
+                  L${500 / 7},${50 - (detailedChartData[5].value - 10000) / 30} 
+                  L${600 / 7},${50 - (detailedChartData[6].value - 10000) / 30}`}
+              fill="none"
+              stroke={darkMode ? '#818cf8' : '#4f46e5'}
+              strokeWidth="0.5"
+            />
+            <path
+              d={`M0,${50 - (detailedChartData[0].value - 10000) / 30} 
+                  L${100 / 7},${50 - (detailedChartData[1].value - 10000) / 30} 
+                  L${200 / 7},${50 - (detailedChartData[2].value - 10000) / 30} 
+                  L${300 / 7},${50 - (detailedChartData[3].value - 10000) / 30} 
+                  L${400 / 7},${50 - (detailedChartData[4].value - 10000) / 30} 
+                  L${500 / 7},${50 - (detailedChartData[5].value - 10000) / 30} 
+                  L${600 / 7},${50 - (detailedChartData[6].value - 10000) / 30} 
+                  L${600 / 7},50 L0,50 Z`}
+              fill="url(#gradient)"
+              fillOpacity="0.2"
+            />
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop
+                  offset="0%"
+                  stopColor={darkMode ? '#818cf8' : '#4f46e5'}
+                  stopOpacity="0.8"
+                />
+                <stop
+                  offset="100%"
+                  stopColor={darkMode ? '#818cf8' : '#4f46e5'}
+                  stopOpacity="0"
+                />
+              </linearGradient>
+            </defs>
+          </svg>
+          {/* X-Axis Labels */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
+            {detailedChartData.map((item, index) => (
+              <div key={index} className="text-xs text-gray-500">
+                {item.date}
+              </div>
+            ))}
+          </div>
+          {/* Y-Axis Labels */}
+          <div className="absolute top-0 right-0 h-full flex flex-col justify-between py-2">
+            <div className="text-xs text-gray-500">$11,500</div>
+            <div className="text-xs text-gray-500">$11,000</div>
+            <div className="text-xs text-gray-500">$10,500</div>
+            <div className="text-xs text-gray-500">$10,000</div>
+          </div>
+        </div>
+      </div>
+      {/* Portfolio Chart */}
+      <div
+        className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}
+      >
+        <h2 className="text-xl font-semibold mb-4">Portfolio Value</h2>
+        <div className="h-64 w-full relative">
+          {/* Portfolio Line Chart */}
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 50"
+            preserveAspectRatio="none"
+          >
+            {/* Grid Lines */}
+            <g className="grid-lines">
+              <line
+                x1="0"
+                y1="10"
+                x2="100"
+                y2="10"
+                stroke={darkMode ? '#4b5563' : '#e5e7eb'}
+                strokeWidth="0.2"
+              />
+              <line
+                x1="0"
+                y1="20"
+                x2="100"
+                y2="20"
+                stroke={darkMode ? '#4b5563' : '#e5e7eb'}
+                strokeWidth="0.2"
+              />
+              <line
+                x1="0"
+                y1="30"
+                x2="100"
+                y2="30"
+                stroke={darkMode ? '#4b5563' : '#e5e7eb'}
+                strokeWidth="0.2"
+              />
+              <line
+                x1="0"
+                y1="40"
+                x2="100"
+                y2="40"
+                stroke={darkMode ? '#4b5563' : '#e5e7eb'}
+                strokeWidth="0.2"
+              />
+            </g>
+            {/* Chart Line */}
+            <path
+              d={`M0,${50 - (portfolioData[0].value / 16000) * 50} 
+                  L${100 / 6},${50 - (portfolioData[1].value / 16000) * 50} 
+                  L${200 / 6},${50 - (portfolioData[2].value / 16000) * 50} 
+                  L${300 / 6},${50 - (portfolioData[3].value / 16000) * 50} 
+                  L${400 / 6},${50 - (portfolioData[4].value / 16000) * 50} 
+                  L${500 / 6},${50 - (portfolioData[5].value / 16000) * 50}
+                  L${600 / 6},${50 - (portfolioData[6].value / 16000) * 50}`}
+              fill="none"
+              stroke={darkMode ? '#a5b4fc' : '#4f46e5'}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Filled Area */}
+            <path
+              d={`M0,${50 - (portfolioData[0].value / 16000) * 50} 
+                  L${100 / 6},${50 - (portfolioData[1].value / 16000) * 50} 
+                  L${200 / 6},${50 - (portfolioData[2].value / 16000) * 50} 
+                  L${300 / 6},${50 - (portfolioData[3].value / 16000) * 50} 
+                  L${400 / 6},${50 - (portfolioData[4].value / 16000) * 50} 
+                  L${500 / 6},${50 - (portfolioData[5].value / 16000) * 50}
+                  L${600 / 6},${50 - (portfolioData[6].value / 16000) * 50}
+                  L${600 / 6},50 L0,50 Z`}
+              fill="url(#portfolioGradient)"
+              fillOpacity="0.5"
+            />
+            {/* Data Points */}
+            {portfolioData.map((item, index) => (
+              <circle
+                key={index}
+                cx={`${(index * 100) / 6}`}
+                cy={`${50 - (item.value / 16000) * 50}`}
+                r="1.2"
+                fill={darkMode ? '#e0e7ff' : '#4338ca'}
+              />
+            ))}
+            <defs>
+              <linearGradient
+                id="portfolioGradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  stopColor={darkMode ? '#818cf8' : '#4f46e5'}
+                  stopOpacity="0.6"
+                />
+                <stop
+                  offset="100%"
+                  stopColor={darkMode ? '#818cf8' : '#4f46e5'}
+                  stopOpacity="0.05"
+                />
+              </linearGradient>
+            </defs>
+          </svg>
+          {/* X-Axis Labels */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
+            {portfolioData.map((item, index) => (
+              <div key={index} className="text-xs text-gray-500">
+                {item.date}
+              </div>
+            ))}
+          </div>
+          {/* Y-Axis Labels */}
+          <div className="absolute top-0 right-0 h-full flex flex-col justify-between py-2">
+            <div className="text-xs text-gray-500">$16,000</div>
+            <div className="text-xs text-gray-500">$14,000</div>
+            <div className="text-xs text-gray-500">$12,000</div>
+            <div className="text-xs text-gray-500">$10,000</div>
+            <div className="text-xs text-gray-500">$8,000</div>
+          </div>
+          {/* Value Indicators */}
+          <div className="absolute top-2 left-2 flex flex-col">
+            <div
+              className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}
+            >
+              ${portfolioData[portfolioData.length - 1].value.toLocaleString()}
+            </div>
+            <div className="text-xs text-green-500">
+              +$
+              {(
+                portfolioData[portfolioData.length - 1].value -
+                portfolioData[0].value
+              ).toLocaleString()}{' '}
+              (+
+              {(
+                ((portfolioData[portfolioData.length - 1].value -
+                  portfolioData[0].value) /
+                  portfolioData[0].value) *
+                100
+              ).toFixed(2)}
+              %)
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Assets Table */}
+      <div
+        className={`rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow overflow-hidden`}
+      >
+        <h2 className="text-xl font-semibold p-6 pb-4">Assets</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead
+              className={`text-left ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
+            >
+              <tr>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Asset
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Shares
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Value
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Gain/Loss
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}
+            >
+              {assets.map((asset, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4">
+                    <div className="font-medium">{asset.name}</div>
+                    <div
+                      className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                    >
+                      {asset.symbol}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">{asset.shares}</td>
+                  <td className="px-6 py-4">${asset.price.toFixed(2)}</td>
+                  <td className="px-6 py-4">${asset.value.toLocaleString()}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className={
+                        asset.gain >= 0 ? 'text-green-500' : 'text-red-500'
+                      }
+                    >
+                      ${asset.gain.toLocaleString()}
+                    </div>
+                    <div
+                      className={`text-sm ${asset.gain >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                    >
+                      {asset.gain >= 0 ? '+' : ''}
+                      {asset.gainPercent.toFixed(2)}%
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+const SummaryCard = ({ title, value, change, darkMode }) => (
+  <div
+    className={`p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}
+  >
+    <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+      {title}
+    </div>
+    <div className="text-xl font-bold mt-1">{value}</div>
+    {change !== undefined && (
+      <div
+        className={`text-sm mt-1 ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}
+      >
+        {change >= 0 ? '+' : ''}
+        {change.toFixed(2)}%
+      </div>
+    )}
+  </div>
+)
+const PortfoliosPage = ({ darkMode }) => {
+  const [activePortfolio, setActivePortfolio] = useState('main')
+  const portfolios = {
+    main: {
+      name: 'Main Portfolio',
+      assets: [
+        {
+          name: 'Apple Inc.',
+          symbol: 'AAPL',
+          shares: 15,
+          price: 178.72,
+          value: 2680.8,
+          cost: 2200,
+          gain: 480.8,
+          gainPercent: 21.85,
+          dividend: 42.5,
+        },
+        {
+          name: 'Microsoft Corp.',
+          symbol: 'MSFT',
+          shares: 8,
+          price: 403.78,
+          value: 3230.24,
+          cost: 2800,
+          gain: 430.24,
+          gainPercent: 15.37,
+          dividend: 67.2,
+        },
+        {
+          name: 'Amazon.com Inc.',
+          symbol: 'AMZN',
+          shares: 12,
+          price: 178.15,
+          value: 2137.8,
+          cost: 1900,
+          gain: 237.8,
+          gainPercent: 12.52,
+          dividend: 0,
+        },
+      ],
+    },
+    retirement: {
+      name: 'Retirement',
+      assets: [
+        {
+          name: 'Vanguard S&P 500 ETF',
+          symbol: 'VOO',
+          shares: 20,
+          price: 470.11,
+          value: 9402.2,
+          cost: 8500,
+          gain: 902.2,
+          gainPercent: 10.61,
+          dividend: 183.4,
+        },
+        {
+          name: 'Vanguard Total Bond ETF',
+          symbol: 'BND',
+          shares: 45,
+          price: 73.82,
+          value: 3321.9,
+          cost: 3400,
+          gain: -78.1,
+          gainPercent: -2.3,
+          dividend: 98.7,
+        },
+      ],
+    },
+    tech: {
+      name: 'Tech Stocks',
+      assets: [
+        {
+          name: 'Nvidia Corp.',
+          symbol: 'NVDA',
+          shares: 5,
+          price: 950.02,
+          value: 4750.1,
+          cost: 3800,
+          gain: 950.1,
+          gainPercent: 25,
+          dividend: 10,
+        },
+        {
+          name: 'Tesla Inc.',
+          symbol: 'TSLA',
+          shares: 10,
+          price: 177.67,
+          value: 1776.7,
+          cost: 2000,
+          gain: -223.3,
+          gainPercent: -11.17,
+          dividend: 0,
+        },
+        {
+          name: 'AMD Inc.',
+          symbol: 'AMD',
+          shares: 25,
+          price: 156.44,
+          value: 3911,
+          cost: 3500,
+          gain: 411,
+          gainPercent: 11.74,
+          dividend: 0,
+        },
+      ],
+    },
+  }
+  const currentPortfolio = portfolios[activePortfolio]
+  const totalValue = currentPortfolio.assets.reduce(
+    (sum, asset) => sum + asset.value,
+    0,
+  )
+  const totalCost = currentPortfolio.assets.reduce(
+    (sum, asset) => sum + asset.cost,
+    0,
+  )
+  const totalGain = totalValue - totalCost
+  const totalGainPercent = (totalGain / totalCost) * 100
+  const totalDividend = currentPortfolio.assets.reduce(
+    (sum, asset) => sum + asset.dividend,
+    0,
+  )
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold mb-4">Portfolios</h1>
+
+      {/* Portfolio Tabs */}
+      <div className="flex space-x-1 overflow-x-auto pb-2">
+        {Object.keys(portfolios).map((key) => (
+          <button
+            key={key}
+            onClick={() => setActivePortfolio(key)}
+            className={`px-4 py-2 rounded-md font-medium whitespace-nowrap ${activePortfolio === key ? (darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900') : darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
+          >
+            {portfolios[key].name}
+          </button>
+        ))}
+      </div>
+
+      {/* Portfolio Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <SummaryCard
+          title="Total Value"
+          value={`$${totalValue.toLocaleString()}`}
+          darkMode={darkMode}
+        />
+        <SummaryCard
+          title="Total Cost"
+          value={`$${totalCost.toLocaleString()}`}
+          darkMode={darkMode}
+        />
+        <SummaryCard
+          title="Total Gain/Loss"
+          value={`$${totalGain.toLocaleString()}`}
+          change={totalGainPercent}
+          darkMode={darkMode}
+        />
+        <SummaryCard
+          title="Dividend Income"
+          value={`$${totalDividend.toLocaleString()}`}
+          darkMode={darkMode}
+        />
+      </div>
+
+      {/* Portfolio Assets */}
+      <div
+        className={`rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow overflow-hidden`}
+      >
+        <h2 className="text-xl font-semibold p-6 pb-4">
+          {currentPortfolio.name} Assets
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead
+              className={`text-left ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
+            >
+              <tr>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Asset
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Shares
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Value
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Cost
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Gain/Loss
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Dividend
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}
+            >
+              {currentPortfolio.assets.map((asset, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4">
+                    <div className="font-medium">{asset.name}</div>
+                    <div
+                      className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                    >
+                      {asset.symbol}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">{asset.shares}</td>
+                  <td className="px-6 py-4">${asset.price.toFixed(2)}</td>
+                  <td className="px-6 py-4">${asset.value.toLocaleString()}</td>
+                  <td className="px-6 py-4">${asset.cost.toLocaleString()}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className={
+                        asset.gain >= 0 ? 'text-green-500' : 'text-red-500'
+                      }
+                    >
+                      ${asset.gain.toLocaleString()}
+                    </div>
+                    <div
+                      className={`text-sm ${asset.gain >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                    >
+                      {asset.gain >= 0 ? '+' : ''}
+                      {asset.gainPercent.toFixed(2)}%
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">${asset.dividend.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+const TransactionsPage = ({ darkMode }) => {
+  const [transactionType, setTransactionType] = useState('buy')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedAsset, setSelectedAsset] = useState(null)
+  const [transactionStage, setTransactionStage] = useState('search') // 'search' or 'details'
+  const [cashTransactionType, setCashTransactionType] = useState('deposit')
+  const [deductFromCash, setDeductFromCash] = useState(true)
+  const [feeType, setFeeType] = useState('fixed') // 'fixed' or 'percentage'
+  // Mock search results
+  const searchResults = [
+    {
+      name: 'Apple Inc.',
+      symbol: 'AAPL',
+      price: 178.72,
+    },
+    {
+      name: 'Microsoft Corp.',
+      symbol: 'MSFT',
+      price: 403.78,
+    },
+    {
+      name: 'Amazon.com Inc.',
+      symbol: 'AMZN',
+      price: 178.15,
+    },
+    {
+      name: 'Tesla Inc.',
+      symbol: 'TSLA',
+      price: 177.67,
+    },
+    {
+      name: 'Nvidia Corp.',
+      symbol: 'NVDA',
+      price: 950.02,
+    },
+  ].filter(
+    (asset) =>
+      asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+  const handleBackToSearch = () => {
+    setTransactionStage('search')
+  }
+  return (
+    <div className="space-y-8">
+      <h1 className="text-2xl font-bold mb-4">Transactions</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Asset Transactions */}
+        <div
+          className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}
+        >
+          <h2 className="text-xl font-semibold mb-4">Asset Transaction</h2>
+          {transactionStage === 'search' ? (
+            <>
+              {/* Transaction Type Selector */}
+              <div className="mb-6">
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Transaction Type
+                </label>
+                <div className="flex space-x-2">
+                  {['buy', 'sell', 'dividend', 'transfer'].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setTransactionType(type)}
+                      className={`px-4 py-2 rounded-md capitalize ${transactionType === type ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-600 text-white') : darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Asset Search */}
+              <div className="mb-4">
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Search Asset
+                </label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by name or symbol"
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
+                />
+              </div>
+              {/* Search Results */}
+              {searchTerm && (
+                <div
+                  className={`mb-6 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}
+                >
+                  {searchResults.length > 0 ? (
+                    <ul
+                      className={`divide-y ${darkMode ? 'divide-gray-600' : 'divide-gray-200'}`}
+                    >
+                      {searchResults.map((asset, index) => (
+                        <li
+                          key={index}
+                          onClick={() => {
+                            setSelectedAsset(asset)
+                            setTransactionStage('details')
+                          }}
+                          className={`p-3 cursor-pointer ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'} ${selectedAsset?.symbol === asset.symbol ? (darkMode ? 'bg-gray-600' : 'bg-gray-100') : ''}`}
+                        >
+                          <div className="font-medium">{asset.name}</div>
+                          <div className="flex justify-between">
+                            <span
+                              className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                            >
+                              {asset.symbol}
+                            </span>
+                            <span className="text-sm">
+                              ${asset.price.toFixed(2)}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="p-3 text-center text-gray-500">
+                      No results found
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Detailed Transaction Form */}
+              <div className="mb-4">
+                <button
+                  onClick={handleBackToSearch}
+                  className={`flex items-center text-sm ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+                >
+                  <ArrowLeftIcon size={16} className="mr-1" /> Back to search
+                </button>
+              </div>
+              <div className="p-3 rounded-md bg-opacity-50 mb-6 flex justify-between items-center">
+                <div>
+                  <div className="font-medium">{selectedAsset.name}</div>
+                  <div
+                    className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
+                    {selectedAsset.symbol}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div>${selectedAsset.price.toFixed(2)}</div>
+                  <div
+                    className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
+                    Current Price
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    {transactionType === 'buy' || transactionType === 'sell'
+                      ? 'Shares'
+                      : transactionType === 'dividend'
+                        ? 'Amount'
+                        : 'Shares to Transfer'}
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    {transactionType === 'buy' || transactionType === 'sell'
+                      ? 'Price per Share'
+                      : transactionType === 'dividend'
+                        ? 'Date'
+                        : 'Destination Portfolio'}
+                  </label>
+                  {transactionType === 'transfer' ? (
+                    <select
+                      className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    >
+                      <option>Main Portfolio</option>
+                      <option>Retirement</option>
+                      <option>Tech Stocks</option>
+                    </select>
+                  ) : transactionType === 'dividend' ? (
+                    <input
+                      type="date"
+                      className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      placeholder={selectedAsset.price.toFixed(2)}
+                      className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Portfolio
+                  </label>
+                  <select
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  >
+                    <option>Main Portfolio</option>
+                    <option>Retirement</option>
+                    <option>Tech Stocks</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Platform
+                  </label>
+                  <select
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  >
+                    <option>Interactive Brokers</option>
+                    <option>Robinhood</option>
+                    <option>Fidelity</option>
+                    <option>Charles Schwab</option>
+                    <option>E*TRADE</option>
+                    <option>TD Ameritrade</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Transaction Fee
+                  </label>
+                  <div className="flex">
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      className={`flex-1 p-2 rounded-l-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    />
+                    <button
+                      onClick={() =>
+                        setFeeType(feeType === 'fixed' ? 'percentage' : 'fixed')
+                      }
+                      className={`px-3 rounded-r-md border-t border-r border-b ${darkMode ? 'bg-gray-600 border-gray-600 text-gray-200' : 'bg-gray-100 border-gray-300 text-gray-700'}`}
+                    >
+                      {feeType === 'fixed' ? '$' : '%'}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Asset Class
+                  </label>
+                  <select
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  >
+                    <option>Stock</option>
+                    <option>ETF</option>
+                    <option>Bond</option>
+                    <option>Mutual Fund</option>
+                    <option>Cryptocurrency</option>
+                    <option>Real Estate</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Sector
+                  </label>
+                  <select
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  >
+                    <option>Technology</option>
+                    <option>Healthcare</option>
+                    <option>Financials</option>
+                    <option>Consumer Discretionary</option>
+                    <option>Communication Services</option>
+                    <option>Industrials</option>
+                    <option>Consumer Staples</option>
+                    <option>Energy</option>
+                    <option>Utilities</option>
+                    <option>Real Estate</option>
+                    <option>Materials</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Country
+                  </label>
+                  <select
+                    className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  >
+                    <option>United States</option>
+                    <option>China</option>
+                    <option>Japan</option>
+                    <option>United Kingdom</option>
+                    <option>Canada</option>
+                    <option>Germany</option>
+                    <option>France</option>
+                    <option>Switzerland</option>
+                    <option>Australia</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Strategy
+                </label>
+                <select
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                >
+                  <option>Long-term Growth</option>
+                  <option>Dividend Income</option>
+                  <option>Value Investing</option>
+                  <option>Momentum Trading</option>
+                  <option>Swing Trading</option>
+                  <option>Day Trading</option>
+                  <option>Index Investing</option>
+                  <option>Sector Rotation</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="deductFromCash"
+                    checked={deductFromCash}
+                    onChange={() => setDeductFromCash(!deductFromCash)}
+                    className={`h-4 w-4 rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-indigo-600' : 'bg-white border-gray-300 text-indigo-600'}`}
+                  />
+                  <label
+                    htmlFor="deductFromCash"
+                    className={`ml-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Deduct from available cash
+                  </label>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Notes
+                </label>
+                <textarea
+                  rows={3}
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                ></textarea>
+              </div>
+              <button
+                className={`w-full py-2 px-4 rounded-md font-medium ${darkMode ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+              >
+                Add{' '}
+                {transactionType.charAt(0).toUpperCase() +
+                  transactionType.slice(1)}{' '}
+                Transaction
+              </button>
+            </>
+          )}
+        </div>
+        {/* Cash Transactions */}
+        <div
+          className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}
+        >
+          <h2 className="text-xl font-semibold mb-4">Cash Transaction</h2>
+          <div className="mb-6">
+            <label
+              className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+            >
+              Transaction Type
+            </label>
+            <div className="flex space-x-2">
+              {['deposit', 'withdrawal'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setCashTransactionType(type)}
+                  className={`px-4 py-2 rounded-md capitalize ${cashTransactionType === type ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-600 text-white') : darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  placeholder="0.00"
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                />
+              </div>
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Currency
+                </label>
+                <select
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                >
+                  <option>USD - US Dollar</option>
+                  <option>EUR - Euro</option>
+                  <option>GBP - British Pound</option>
+                  <option>JPY - Japanese Yen</option>
+                  <option>CAD - Canadian Dollar</option>
+                  <option>AUD - Australian Dollar</option>
+                  <option>CHF - Swiss Franc</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Date
+                </label>
+                <input
+                  type="date"
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                />
+              </div>
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  Portfolio
+                </label>
+                <select
+                  className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                >
+                  <option>Main Portfolio</option>
+                  <option>Retirement</option>
+                  <option>Tech Stocks</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+              >
+                Platform
+              </label>
+              <select
+                className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+              >
+                <option>Interactive Brokers</option>
+                <option>Robinhood</option>
+                <option>Fidelity</option>
+                <option>Charles Schwab</option>
+                <option>E*TRADE</option>
+                <option>TD Ameritrade</option>
+                <option>Bank Transfer</option>
+              </select>
+            </div>
+            <div>
+              <label
+                className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+              >
+                Notes
+              </label>
+              <textarea
+                rows={3}
+                className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+              ></textarea>
+            </div>
+            <button
+              className={`w-full py-2 px-4 rounded-md font-medium ${darkMode ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+            >
+              Add{' '}
+              {cashTransactionType.charAt(0).toUpperCase() +
+                cashTransactionType.slice(1)}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+const WatchlistsPage = ({ darkMode }) => {
+  const [activeWatchlist, setActiveWatchlist] = useState('tech')
+  const [showAddAsset, setShowAddAsset] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const watchlists = {
+    tech: {
+      name: 'Tech Stocks',
+      assets: [
+        {
+          name: 'Apple Inc.',
+          symbol: 'AAPL',
+          price: 178.72,
+          change: 1.25,
+          changePercent: 0.7,
+          marketCap: '2.8T',
+          pe: 29.4,
+          yield: 0.54,
+        },
+        {
+          name: 'Microsoft Corp.',
+          symbol: 'MSFT',
+          price: 403.78,
+          change: 5.43,
+          changePercent: 1.36,
+          marketCap: '3.0T',
+          pe: 34.8,
+          yield: 0.72,
+        },
+        {
+          name: 'Nvidia Corp.',
+          symbol: 'NVDA',
+          price: 950.02,
+          change: -12.68,
+          changePercent: -1.32,
+          marketCap: '2.3T',
+          pe: 69.2,
+          yield: 0.03,
+        },
+        {
+          name: 'AMD Inc.',
+          symbol: 'AMD',
+          price: 156.44,
+          change: 2.32,
+          changePercent: 1.51,
+          marketCap: '252.6B',
+          pe: 92.3,
+          yield: 0,
+        },
+        {
+          name: 'Intel Corp.',
+          symbol: 'INTC',
+          price: 21.45,
+          change: -0.35,
+          changePercent: -1.6,
+          marketCap: '90.7B',
+          pe: 22.1,
+          yield: 1.58,
+        },
+      ],
+    },
+    dividend: {
+      name: 'Dividend Stocks',
+      assets: [
+        {
+          name: 'Johnson & Johnson',
+          symbol: 'JNJ',
+          price: 151.34,
+          change: 0.78,
+          changePercent: 0.52,
+          marketCap: '364.5B',
+          pe: 9.4,
+          yield: 3.42,
+        },
+        {
+          name: 'Coca-Cola Co.',
+          symbol: 'KO',
+          price: 60.83,
+          change: 0.32,
+          changePercent: 0.53,
+          marketCap: '262.8B',
+          pe: 24.2,
+          yield: 3.11,
+        },
+        {
+          name: 'Procter & Gamble',
+          symbol: 'PG',
+          price: 164.45,
+          change: 1.05,
+          changePercent: 0.64,
+          marketCap: '387.2B',
+          pe: 26.8,
+          yield: 2.43,
+        },
+        {
+          name: 'Verizon Communications',
+          symbol: 'VZ',
+          price: 39.62,
+          change: -0.15,
+          changePercent: -0.38,
+          marketCap: '166.7B',
+          pe: 14.5,
+          yield: 6.56,
+        },
+      ],
+    },
+    etfs: {
+      name: 'ETFs',
+      assets: [
+        {
+          name: 'Vanguard S&P 500 ETF',
+          symbol: 'VOO',
+          price: 470.11,
+          change: 2.34,
+          changePercent: 0.5,
+          marketCap: '358.2B',
+          pe: null,
+          yield: 1.34,
+        },
+        {
+          name: 'Invesco QQQ Trust',
+          symbol: 'QQQ',
+          price: 434.56,
+          change: 3.12,
+          changePercent: 0.72,
+          marketCap: '239.4B',
+          pe: null,
+          yield: 0.51,
+        },
+        {
+          name: 'iShares Core S&P 500 ETF',
+          symbol: 'IVV',
+          price: 472.84,
+          change: 2.38,
+          changePercent: 0.51,
+          marketCap: '379.5B',
+          pe: null,
+          yield: 1.31,
+        },
+        {
+          name: 'SPDR S&P 500 ETF Trust',
+          symbol: 'SPY',
+          price: 469.52,
+          change: 2.33,
+          changePercent: 0.5,
+          marketCap: '432.1B',
+          pe: null,
+          yield: 1.37,
+        },
+      ],
+    },
+    crypto: {
+      name: 'Crypto',
+      assets: [
+        {
+          name: 'Bitcoin',
+          symbol: 'BTC',
+          price: 65432.1,
+          change: 1250.25,
+          changePercent: 1.95,
+          marketCap: '1.3T',
+          pe: null,
+          yield: null,
+        },
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          price: 3456.78,
+          change: 78.45,
+          changePercent: 2.32,
+          marketCap: '415.2B',
+          pe: null,
+          yield: null,
+        },
+        {
+          name: 'Solana',
+          symbol: 'SOL',
+          price: 145.23,
+          change: -3.45,
+          changePercent: -2.32,
+          marketCap: '63.8B',
+          pe: null,
+          yield: null,
+        },
+      ],
+    },
+  }
+  // Mock search results
+  const searchResults = [
+    {
+      name: 'Tesla Inc.',
+      symbol: 'TSLA',
+      price: 177.67,
+    },
+    {
+      name: 'Amazon.com Inc.',
+      symbol: 'AMZN',
+      price: 178.15,
+    },
+    {
+      name: 'Meta Platforms Inc.',
+      symbol: 'META',
+      price: 475.98,
+    },
+    {
+      name: 'Alphabet Inc.',
+      symbol: 'GOOGL',
+      price: 163.45,
+    },
+  ].filter(
+    (asset) =>
+      asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+  const currentWatchlist = watchlists[activeWatchlist]
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Watchlists</h1>
+        <button
+          onClick={() => setShowAddAsset(!showAddAsset)}
+          className={`flex items-center px-3 py-1 rounded-md text-sm ${darkMode ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+        >
+          {showAddAsset ? (
+            <XIcon size={16} className="mr-1" />
+          ) : (
+            <PlusIcon size={16} className="mr-1" />
+          )}
+          {showAddAsset ? 'Cancel' : 'Add Asset'}
+        </button>
+      </div>
+      {/* Watchlist Tabs */}
+      <div className="flex space-x-1 overflow-x-auto pb-2">
+        {Object.keys(watchlists).map((key) => (
+          <button
+            key={key}
+            onClick={() => setActiveWatchlist(key)}
+            className={`px-4 py-2 rounded-md font-medium whitespace-nowrap ${activeWatchlist === key ? (darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900') : darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
+          >
+            {watchlists[key].name}
+          </button>
+        ))}
+        <button
+          className={`px-4 py-2 rounded-md font-medium whitespace-nowrap flex items-center ${darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
+        >
+          <PlusIcon size={16} className="mr-1" /> New Watchlist
+        </button>
+      </div>
+      {/* Add Asset Form */}
+      {showAddAsset && (
+        <div
+          className={`p-4 rounded-lg mb-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}
+        >
+          <h3 className="text-lg font-medium mb-3">
+            Add Asset to {currentWatchlist.name}
+          </h3>
+          <div className="mb-4">
+            <label
+              className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+            >
+              Search Asset
+            </label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or symbol"
+              className={`w-full p-2 rounded-md border ${darkMode ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
+            />
+          </div>
+          {searchTerm && (
+            <div
+              className={`mb-4 rounded-md border ${darkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-300'}`}
+            >
+              {searchResults.length > 0 ? (
+                <ul
+                  className={`divide-y ${darkMode ? 'divide-gray-500' : 'divide-gray-200'}`}
+                >
+                  {searchResults.map((asset, index) => (
+                    <li
+                      key={index}
+                      className={`p-3 flex justify-between items-center ${darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-50'}`}
+                    >
+                      <div>
+                        <div className="font-medium">{asset.name}</div>
+                        <div
+                          className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                        >
+                          {asset.symbol}
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-3">${asset.price.toFixed(2)}</span>
+                        <button
+                          className={`p-1 rounded-md ${darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
+                          title="Add to portfolio"
+                        >
+                          <PlusIcon size={16} />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="p-3 text-center text-gray-500">
+                  No results found
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {/* Watchlist Table */}
+      <div
+        className={`rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow overflow-hidden`}
+      >
+        <div className="p-6 pb-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold">{currentWatchlist.name}</h2>
+          <div className="flex space-x-2">
+            <button
+              className={`p-1 rounded-md ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+            >
+              <LineChartIcon size={20} />
+            </button>
+            <button
+              className={`p-1 rounded-md ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+            >
+              <PieChartIcon size={20} />
+            </button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead
+              className={`text-left ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
+            >
+              <tr>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Asset
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Change
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Market Cap
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  P/E
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Yield
+                </th>
+                <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}
+            >
+              {currentWatchlist.assets.map((asset, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4">
+                    <div className="font-medium">{asset.name}</div>
+                    <div
+                      className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                    >
+                      {asset.symbol}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">${asset.price.toFixed(2)}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className={
+                        asset.change >= 0 ? 'text-green-500' : 'text-red-500'
+                      }
+                    >
+                      ${Math.abs(asset.change).toFixed(2)} (
+                      {asset.change >= 0 ? '+' : ''}
+                      {asset.changePercent.toFixed(2)}%)
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">{asset.marketCap}</td>
+                  <td className="px-6 py-4">
+                    {asset.pe ? asset.pe.toFixed(1) : '-'}
+                  </td>
+                  <td className="px-6 py-4">
+                    {asset.yield ? `${asset.yield.toFixed(2)}%` : '-'}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex space-x-2">
+                      <button
+                        className={`p-1 rounded-md ${darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
+                        title="Add to portfolio"
+                      >
+                        <PlusIcon size={16} />
+                      </button>
+                      <button
+                        className={`p-1 rounded-md ${darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
+                        title="Remove from watchlist"
+                      >
+                        <XIcon size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+export { App }
+
+// index.css:
+
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+
+// index.tsx:
+
+import React from 'react'
+import './index.css'
+import { createRoot } from 'react-dom/client'
+import { App } from './App'
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Failed to find the root element')
+const root = createRoot(rootElement)
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+// tailwind.config.js:
+
+export default {}
