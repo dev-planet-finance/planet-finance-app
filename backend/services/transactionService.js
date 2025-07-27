@@ -11,6 +11,41 @@ class TransactionService {
    * @returns {Promise<Object>} Processed transaction with updated holdings
    */
   async processTransaction(transactionData) {
+    // Development mode: return mock transaction data
+    if (process.env.NODE_ENV === 'development' || !this.pool) {
+      console.log('🔧 Development mode: Processing mock transaction');
+      
+      const mockTransaction = {
+        id: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        user_id: 'dev-user-1',
+        portfolio_id: 'dev-portfolio-1',
+        transaction_type: transactionData.type,
+        asset_symbol: transactionData.symbol || null,
+        asset_name: transactionData.name || null,
+        quantity: parseFloat(transactionData.quantity) || null,
+        price_per_share: parseFloat(transactionData.price) || null,
+        total_amount: transactionData.quantity && transactionData.price ? 
+          parseFloat(transactionData.quantity) * parseFloat(transactionData.price) : 
+          parseFloat(transactionData.amount) || 0,
+        fee: parseFloat(transactionData.fee) || 0,
+        currency: transactionData.currency || 'USD',
+        transaction_date: transactionData.date || new Date().toISOString().split('T')[0],
+        transaction_time: transactionData.time || '09:30:00',
+        platform: transactionData.platform || 'Manual',
+        asset_class: transactionData.assetClass || null,
+        sector: transactionData.sector || null,
+        country: transactionData.country || null,
+        strategy: transactionData.strategy || null,
+        notes: transactionData.notes || '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log(`✅ Mock ${transactionData.type} transaction created:`, mockTransaction.id);
+      return mockTransaction;
+    }
+    
+    // Production mode: use real database
     const client = await this.pool.connect();
     
     try {

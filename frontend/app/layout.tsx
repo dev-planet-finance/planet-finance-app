@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Planet Finance - Portfolio Tracker',
-  description: 'Professional portfolio tracking inspired by Delta by eToro',
+  description: 'Professional portfolio tracking and investment management platform',
 }
 
 export default function RootLayout({

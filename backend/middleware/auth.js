@@ -1,25 +1,28 @@
-const admin = require('firebase-admin');
 const { Pool } = require('pg');
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
+// Conditionally initialize Firebase Admin SDK only in production
+let admin = null;
+let firebaseInitialized = false;
+
+if (process.env.NODE_ENV === 'production' && process.env.FIREBASE_PROJECT_ID) {
   try {
-    // Check if we have environment variables for Firebase Admin
-    if (process.env.FIREBASE_PROJECT_ID) {
+    admin = require('firebase-admin');
+    if (!admin.apps.length) {
       admin.initializeApp({
         projectId: process.env.FIREBASE_PROJECT_ID,
-        // For development, we'll use a simplified approach
         // In production, you'd use proper service account credentials
       });
       console.log('✅ Firebase Admin SDK initialized with project ID:', process.env.FIREBASE_PROJECT_ID);
-    } else {
-      console.log('⚠️  Firebase Admin SDK not initialized: Missing FIREBASE_PROJECT_ID');
-      console.log('For development, we\'ll use test authentication');
+      firebaseInitialized = true;
     }
   } catch (error) {
     console.log('⚠️  Firebase Admin SDK initialization error:', error.message);
-    console.log('Falling back to test authentication for development');
+    firebaseInitialized = false;
   }
+} else {
+  console.log('🔧 Development mode: Firebase Admin SDK disabled');
+  console.log('Using mock authentication for development');
+  firebaseInitialized = false;
 }
 
 // Database connection for user management

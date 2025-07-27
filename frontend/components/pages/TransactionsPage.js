@@ -1,12 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TransactionsPage() {
-  const [transactionType, setTransactionType] = useState('buy');
-  const [searchTerm, setSearchTerm] = useState('');
+  const { currentUser } = useAuth();
+  
+  // Form state
+  const [showAssetForm, setShowAssetForm] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
-  const [transactionStage, setTransactionStage] = useState('search'); // 'search' or 'details'
+  const [activeTransactionTab, setActiveTransactionTab] = useState('buy');
+  
+  // Transaction form data
+  const [shares, setShares] = useState('');
+  const [pricePerShare, setPricePerShare] = useState('');
+  const [transactionDate, setTransactionDate] = useState(new Date().toISOString().split('T')[0]);
+  const [portfolio, setPortfolio] = useState('Main Portfolio');
+  const [platform, setPlatform] = useState('Interactive Brokers');
+  const [transactionFee, setTransactionFee] = useState('');
+  const [notes, setNotes] = useState('');
+  
+  // Cash transaction data
+  const [cashAmount, setCashAmount] = useState('');
   const [cashTransactionType, setCashTransactionType] = useState('deposit');
 
   // Mock assets data matching Magic Patterns
@@ -15,8 +32,119 @@ export default function TransactionsPage() {
     { symbol: 'MSFT', name: 'Microsoft Corp.', price: 403.78, type: 'stock' },
     { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.80, type: 'stock' },
     { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.15, type: 'stock' },
-    { symbol: 'NVDA', name: 'Nvidia Corp.', price: 950.02, type: 'stock' }
+    { symbol: 'NVDA', name: 'Nvidia Corp.', price: 950.02, type: 'stock' },
+    { symbol: 'BTC', name: 'Bitcoin', price: 67420.00, type: 'crypto' },
+    { symbol: 'ETH', name: 'Ethereum', price: 3200.00, type: 'crypto' }
   ];
+
+  // Functions
+  const handleAssetSearch = () => {
+    if (searchQuery.trim()) {
+      const filtered = mockAssets.filter(asset =>
+        asset.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(filtered);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const selectAsset = (asset) => {
+    setSelectedAsset(asset);
+    setPricePerShare(asset.price.toString());
+    setSearchResults([]);
+  };
+
+  const handleBuyTransaction = async () => {
+    if (!selectedAsset || !shares || !pricePerShare) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      // Use backend API instead of direct fetch
+      const { transactionAPI } = await import('@/lib/api');
+      
+      console.log('🔄 Creating buy transaction:', {
+        symbol: selectedAsset.symbol,
+        quantity: parseFloat(shares),
+        price: parseFloat(pricePerShare)
+      });
+      
+      const response = await transactionAPI.createTransaction({
+        type: 'buy',
+        symbol: selectedAsset.symbol,
+        name: selectedAsset.name,
+        quantity: parseFloat(shares),
+        price: parseFloat(pricePerShare),
+        date: transactionDate,
+        platform: platform || 'Manual',
+        fee: parseFloat(transactionFee) || 0,
+        notes: notes || '',
+        assetClass: 'Stock'
+      });
+
+      if (response.data.success) {
+        console.log('✅ Transaction created successfully:', response.data.data.id);
+        alert(`Transaction added successfully! ID: ${response.data.data.id}`);
+        
+        // Reset form
+        setSelectedAsset(null);
+        setShares('');
+        setPricePerShare('');
+        setNotes('');
+        setTransactionFee('');
+        
+        // Optionally refresh portfolio data
+        window.location.reload();
+      } else {
+        console.error('❌ Transaction failed:', response.data.error);
+        alert('Error adding transaction: ' + response.data.error);
+      }
+    } catch (error) {
+      console.error('❌ Transaction error:', error);
+      alert('Error adding transaction: ' + (error.response?.data?.error || error.message));
+    }
+  };
+
+  const handleCashTransaction = async () => {
+    if (!cashAmount) {
+      alert('Please enter an amount');
+      return;
+    }
+
+    try {
+      const token = await currentUser.getIdToken();
+      const response = await fetch('http://localhost:5000/api/transactions/cash', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: cashTransactionType,
+          amount: parseFloat(cashAmount),
+          date: transactionDate,
+          portfolio: portfolio,
+          platform: platform,
+          notes: notes
+        })
+      });
+
+      if (response.ok) {
+        alert('Cash transaction added successfully!');
+        setCashAmount('');
+        setNotes('');
+      } else {
+        const error = await response.json();
+        alert('Error adding cash transaction: ' + error.message);
+      }
+    } catch (error) {
+      console.error('Cash transaction error:', error);
+      alert('Error adding cash transaction');
+    }
+  };
 
   const filteredAssets = mockAssets.filter(asset =>
     asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -86,7 +214,7 @@ export default function TransactionsPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search stocks, ETFs, crypto..."
-                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       onKeyPress={(e) => e.key === 'Enter' && handleAssetSearch()}
                     />
                     <button
@@ -177,6 +305,8 @@ export default function TransactionsPage() {
                       type="number"
                       step="0.00001"
                       placeholder="0.00"
+                      value={shares}
+                      onChange={(e) => setShares(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -190,7 +320,8 @@ export default function TransactionsPage() {
                       <input
                         type="number"
                         step="0.01"
-                        defaultValue={selectedAsset.price}
+                        value={pricePerShare}
+                        onChange={(e) => setPricePerShare(e.target.value)}
                         className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
@@ -202,8 +333,9 @@ export default function TransactionsPage() {
                     </label>
                     <input
                       type="date"
-                      defaultValue={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value={transactionDate}
+                      onChange={(e) => setTransactionDate(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                   
@@ -211,14 +343,19 @@ export default function TransactionsPage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Portfolio
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      <option value="main">Main Portfolio</option>
-                      <option value="retirement">Retirement</option>
-                      <option value="tech">Tech Stocks</option>
+                    <select 
+                      value={portfolio}
+                      onChange={(e) => setPortfolio(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="Main Portfolio">Main Portfolio</option>
+                      <option value="Retirement">Retirement</option>
+                      <option value="Tech Stocks">Tech Stocks</option>
                     </select>
                   </div>
                   
                   <button
+                    onClick={handleBuyTransaction}
                     className={`w-full py-3 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                       activeTransactionTab === 'buy'
                         ? 'bg-green-600 hover:bg-green-700 text-white'

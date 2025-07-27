@@ -2,14 +2,43 @@ const { Pool } = require('pg');
 
 class DatabaseService {
   constructor() {
-    // Use the Railway external URL directly for now
-    const connectionString = process.env.DATABASE_URL || 
-      'postgresql://postgres:bumXFeizMBsVTXanhjxncujQbHnnAsAu@yamanote.proxy.rlwy.net:39114/railway';
+    // Check if we're in development mode
+    const isDevelopment = process.env.NODE_ENV === 'development';
     
-    this.pool = new Pool({
-      connectionString: connectionString,
-      ssl: false // Railway external connection doesn't need SSL
-    });
+    if (isDevelopment) {
+      console.log('🔧 Development mode: Using mock database service');
+      this.pool = null; // No real database connection in development
+      return;
+    }
+    
+    // Production mode: Use Railway database
+    let connectionString = process.env.DATABASE_URL;
+    
+    // Fallback to hardcoded Railway connection if needed
+    if (!connectionString) {
+      connectionString = 'postgresql://postgres:bumXFeizMBsVTXanhjxncujQbHnnAsAu@yamanote.proxy.rlwy.net:39114/railway';
+      console.log('⚠️ Using fallback database connection');
+    }
+    
+    // Clean up any malformed connection string
+    connectionString = connectionString.replace(/railwayDB_HOST=[^/]+/, 'railway');
+    
+    console.log('Database connection string:', connectionString.replace(/:[^:@]*@/, ':***@')); // Log without password
+    
+    try {
+      this.pool = new Pool({
+        connectionString: connectionString,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
+      
+      console.log('✅ Database pool initialized');
+    } catch (error) {
+      console.error('❌ Database pool initialization error:', error.message);
+      this.pool = null;
+    }
   }
 
   /**
@@ -18,6 +47,17 @@ class DatabaseService {
    * @returns {Promise<Object>} Asset data with data_source
    */
   async getAssetBySymbol(symbol) {
+    // Development mode: return mock data
+    if (!this.pool) {
+      const mockAssets = {
+        'CAT': { id: 1, symbol: 'CAT', name: 'Caterpillar Inc.', asset_type: 'stock', data_source: 'EODHD', exchange: 'US', currency: 'USD' },
+        'AAPL': { id: 2, symbol: 'AAPL', name: 'Apple Inc.', asset_type: 'stock', data_source: 'EODHD', exchange: 'US', currency: 'USD' },
+        'BTC': { id: 3, symbol: 'BTC', name: 'Bitcoin', asset_type: 'crypto', data_source: 'CoinGecko', exchange: 'CRYPTO', currency: 'USD' }
+      };
+      return mockAssets[symbol.toUpperCase()] || null;
+    }
+    
+    // Production mode: use real database
     const query = `
       SELECT id, symbol, name, asset_type, data_source, exchange, currency
       FROM assets 
@@ -35,6 +75,39 @@ class DatabaseService {
    * @returns {Promise<Array>} Array of assets with holdings
    */
   async getPortfolioAssets(portfolioId) {
+    // Development mode: return mock portfolio data
+    if (!this.pool) {
+      return [
+        {
+          id: 1,
+          symbol: 'CAT',
+          name: 'Caterpillar Inc.',
+          asset_type: 'stock',
+          data_source: 'EODHD',
+          exchange: 'US',
+          currency: 'USD',
+          quantity: 10,
+          average_cost: 275.50,
+          total_cost: 2755.00,
+          last_updated: new Date().toISOString()
+        },
+        {
+          id: 2,
+          symbol: 'AAPL',
+          name: 'Apple Inc.',
+          asset_type: 'stock',
+          data_source: 'EODHD',
+          exchange: 'US',
+          currency: 'USD',
+          quantity: 5,
+          average_cost: 190.00,
+          total_cost: 950.00,
+          last_updated: new Date().toISOString()
+        }
+      ];
+    }
+    
+    // Production mode: use real database
     const query = `
       SELECT 
         a.id,

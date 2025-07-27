@@ -3,11 +3,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import OverviewPage from '@/components/pages/OverviewPage';
+import PortfoliosPage from '@/components/pages/PortfoliosPage';
+import TransactionsPage from '@/components/pages/TransactionsPage';
+import WatchlistsPage from '@/components/pages/WatchlistsPage';
+import AnalyticsPage from '@/components/pages/AnalyticsPage';
+import SettingsPage from '@/components/pages/SettingsPage';
 
-export default function DashboardLayout({ children, activeTab, onTabChange }) {
+export default function DashboardPage() {
   const { currentUser, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const tabs = [
@@ -27,9 +33,28 @@ export default function DashboardLayout({ children, activeTab, onTabChange }) {
     }
   };
 
+  const renderPage = () => {
+    switch (activeTab) {
+      case 'overview':
+        return <OverviewPage />;
+      case 'portfolios':
+        return <PortfoliosPage />;
+      case 'transactions':
+        return <TransactionsPage />;
+      case 'watchlists':
+        return <WatchlistsPage />;
+      case 'analytics':
+        return <AnalyticsPage />;
+      case 'settings':
+        return <SettingsPage />;
+      default:
+        return <OverviewPage />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - Clean white design matching Magic Patterns */}
+      {/* Header - Clean Magic Patterns Design */}
       <header className="w-full bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -46,7 +71,7 @@ export default function DashboardLayout({ children, activeTab, onTabChange }) {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     activeTab === tab.id
                       ? 'bg-indigo-100 text-indigo-700'
@@ -109,48 +134,14 @@ export default function DashboardLayout({ children, activeTab, onTabChange }) {
                   </div>
                 )}
               </div>
-              
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>
-        
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <div className="px-4 py-2 space-y-1">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    onTabChange(tab.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    activeTab === tab.id
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+        {renderPage()}
       </main>
     </div>
   );

@@ -16,10 +16,14 @@ const api = axios.create({
 // Add auth token to requests
 api.interceptors.request.use(async (config) => {
   try {
-    const user = auth.currentUser;
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+    // In development mode, use stored token from localStorage
+    // This works with our backend's mock authentication
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('firebaseToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔑 Using stored auth token for API request');
+      }
     }
   } catch (error) {
     console.error('Error getting auth token:', error);
@@ -36,7 +40,7 @@ export const portfolioAPI = {
   createPortfolio: (portfolioData) => api.post('/api/portfolios', portfolioData),
   
   // Get portfolio summary with holdings
-  getPortfolioSummary: (portfolioId) => api.get(`/api/portfolios/${portfolioId}/summary`),
+  getPortfolioSummary: (portfolioId) => api.get(`/api/portfolios/summary`),
   
   // Update portfolio
   updatePortfolio: (portfolioId, updateData) => api.put(`/api/portfolios/${portfolioId}`, updateData),
@@ -87,7 +91,7 @@ export const priceAPI = {
   getCryptoPrice: (symbol) => api.get(`/api/prices/crypto/${symbol}`),
   
   // Search assets
-  searchAssets: (query) => api.get(`/api/prices/search?q=${encodeURIComponent(query)}`),
+  searchAssets: (query) => api.get(`/api/assets/search?query=${encodeURIComponent(query)}`),
   
   // Get bulk prices
   getBulkPrices: (assets) => api.post('/api/prices/bulk', { assets }),
@@ -101,6 +105,24 @@ export const priceAPI = {
   
   // Get exchange rates
   getExchangeRates: () => api.get('/api/prices/exchange-rates'),
+};
+
+// Authentication API calls
+export const authAPI = {
+  // Register new user
+  register: (userData) => api.post('/api/auth/register', userData),
+  
+  // Login user
+  login: (credentials) => api.post('/api/auth/login', credentials),
+  
+  // Logout user
+  logout: () => api.post('/api/auth/logout'),
+  
+  // Get current user info
+  getCurrentUser: () => api.get('/api/auth/me'),
+  
+  // Refresh token
+  refreshToken: () => api.post('/api/auth/refresh'),
 };
 
 // Error handling helper

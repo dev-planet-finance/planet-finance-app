@@ -1,6 +1,6 @@
 # 🌍 Planet Finance App
 
-> **A comprehensive portfolio tracking platform inspired by Delta by eToro and Stock Events**
+> **A comprehensive professional portfolio tracking platform**
 
 [![Status](https://img.shields.io/badge/Status-In%20Development-yellow)](https://github.com/planetfinance/planet-finance-app)
 [![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20Node.js%20%7C%20PostgreSQL-blue)](https://github.com/planetfinance/planet-finance-app)
@@ -8,7 +8,7 @@
 
 ## 🎯 Project Vision
 
-Building the next-generation investment tracking platform that rivals Delta by eToro and Stock Events. Planet Finance will provide comprehensive portfolio management across stocks, ETFs, and cryptocurrencies with real-time data, advanced analytics, and professional-grade features.
+Building the next-generation investment tracking platform with comprehensive portfolio management across stocks, ETFs, and cryptocurrencies with real-time data, advanced analytics, and professional-grade features.
 
 ## 🚀 Current Development Status
 
@@ -165,8 +165,7 @@ npm run dev  # Starts on port 3002
 ## 🎨 Design Philosophy
 
 **Inspired by the best:**
-- **Delta by eToro**: Clean, professional interface with focus on portfolio performance
-- **Stock Events**: Modern design patterns and user experience
+- **Professional Design**: Clean, modern interface with focus on portfolio performance and user experience
 - **Robinhood**: Simple, accessible investment tracking
 - **Personal Capital**: Comprehensive financial dashboard
 

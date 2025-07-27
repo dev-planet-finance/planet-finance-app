@@ -25,24 +25,39 @@ export function AuthProvider({ children }) {
   async function signup(email, password, displayName) {
     try {
       setError('');
-      const result = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update display name
-      if (displayName) {
-        await updateProfile(result.user, { displayName });
+      // Use backend API for registration
+      const { authAPI } = await import('@/lib/api');
+      const response = await authAPI.register({
+        email,
+        password,
+        displayName: displayName || email.split('@')[0]
+      });
+      
+      if (response.data.success) {
+        // Store the backend token
+        const token = response.data.token;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('displayName', displayName || email.split('@')[0]);
+        }
+        
+        // Set current user state
+        setCurrentUser({
+          uid: response.data.user.uid,
+          email: email,
+          displayName: displayName || email.split('@')[0]
+        });
+        
+        console.log('✅ Backend signup successful, token stored');
+        return response.data;
+      } else {
+        throw new Error(response.data.error || 'Registration failed');
       }
-      
-      // Get and store the token immediately
-      const token = await result.user.getIdToken();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('firebaseToken', token);
-        localStorage.setItem('firebaseEmail', result.user.email || '');
-      }
-      
-      console.log('✅ Signup successful, token stored');
-      return result;
     } catch (error) {
-      setError(error.message);
+      console.error('❌ Signup error:', error);
+      setError(error.response?.data?.error || error.message);
       throw error;
     }
   }
@@ -51,19 +66,35 @@ export function AuthProvider({ children }) {
   async function login(email, password) {
     try {
       setError('');
-      const result = await signInWithEmailAndPassword(auth, email, password);
       
-      // Get and store the token immediately
-      const token = await result.user.getIdToken();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('firebaseToken', token);
-        localStorage.setItem('firebaseEmail', result.user.email || '');
+      // Use backend API for login
+      const { authAPI } = await import('@/lib/api');
+      const response = await authAPI.login({ email, password });
+      
+      if (response.data.success) {
+        // Store the backend token
+        const token = response.data.token;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('displayName', response.data.user.displayName || email.split('@')[0]);
+        }
+        
+        // Set current user state
+        setCurrentUser({
+          uid: response.data.user.uid,
+          email: email,
+          displayName: response.data.user.displayName || email.split('@')[0]
+        });
+        
+        console.log('✅ Backend login successful, token stored');
+        return response.data;
+      } else {
+        throw new Error(response.data.error || 'Login failed');
       }
-      
-      console.log('✅ Login successful, token stored');
-      return result;
     } catch (error) {
-      setError(error.message);
+      console.error('❌ Login error:', error);
+      setError(error.response?.data?.error || error.message);
       throw error;
     }
   }
@@ -72,9 +103,27 @@ export function AuthProvider({ children }) {
   async function logout() {
     try {
       setError('');
-      return await signOut(auth);
+      
+      // Use backend API for logout
+      const { authAPI } = await import('@/lib/api');
+      await authAPI.logout();
+      
+      // Clear stored tokens and user data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('firebaseToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('displayName');
+      }
+      
+      // Clear current user state
+      setCurrentUser(null);
+      
+      console.log('✅ Backend logout successful');
+      return { success: true };
     } catch (error) {
-      setError(error.message);
+      console.error('❌ Logout error:', error);
+      setError(error.response?.data?.error || error.message);
       throw error;
     }
   }
@@ -88,13 +137,43 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-      setCurrentUser(user);
-      setLoading(false);
-    });
+    // Initialize auth state from stored tokens (backend integration)
+    const initializeAuth = async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('authToken');
+          const email = localStorage.getItem('userEmail');
+          const displayName = localStorage.getItem('displayName');
+          
+          if (token && email) {
+            // Verify token with backend
+            const { authAPI } = await import('@/lib/api');
+            try {
+              const response = await authAPI.getCurrentUser();
+              if (response.data.success) {
+                setCurrentUser({
+                  uid: response.data.user.uid,
+                  email: email,
+                  displayName: displayName || email.split('@')[0]
+                });
+                console.log('✅ Auth state restored from backend');
+              }
+            } catch (error) {
+              console.log('⚠️ Token invalid, clearing auth state');
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('userEmail');
+              localStorage.removeItem('displayName');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ Auth initialization error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return unsubscribe;
+    initializeAuth();
   }, []);
 
   const value = {

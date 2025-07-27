@@ -3,6 +3,7 @@ const priceService = require('./priceService');
 
 class PortfolioService {
   constructor() {
+    // Use the singleton database service instance
     this.pool = databaseService.pool;
   }
 
@@ -103,6 +104,66 @@ class PortfolioService {
    * @returns {Promise<Object>} Portfolio with holdings and current values
    */
   async getPortfolioSummary(portfolioId) {
+    // Development mode: return mock portfolio summary
+    if (process.env.NODE_ENV === 'development' || !this.pool) {
+      console.log('🔧 Development mode: Returning mock portfolio summary');
+      return {
+        id: portfolioId || 'dev-portfolio-1',
+        user_id: 'dev-user-1',
+        name: 'My Investment Portfolio',
+        description: 'Development portfolio with mock data',
+        base_currency: 'USD',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        holdings: [
+          {
+            id: 1,
+            asset_id: 1,
+            symbol: 'CAT',
+            name: 'Caterpillar Inc.',
+            asset_type: 'stock',
+            quantity: 10,
+            average_cost: 275.50,
+            total_cost_basis: 2755.00,
+            current_price: 280.50,
+            current_value: 2805.00,
+            gain_loss: 50.00,
+            percent_gain_loss: 1.82
+          },
+          {
+            id: 2,
+            asset_id: 2,
+            symbol: 'AAPL',
+            name: 'Apple Inc.',
+            asset_type: 'stock',
+            quantity: 5,
+            average_cost: 190.00,
+            total_cost_basis: 950.00,
+            current_price: 192.53,
+            current_value: 962.65,
+            gain_loss: 12.65,
+            percent_gain_loss: 1.33
+          }
+        ],
+        cash_balances: [
+          {
+            currency: 'USD',
+            balance: 5000.00
+          }
+        ],
+        summary: {
+          total_invested: 3705.00,
+          total_current_value: 3767.65,
+          total_cash: 5000.00,
+          total_portfolio_value: 8767.65,
+          total_gain_loss: 62.65,
+          total_percent_gain_loss: 1.69,
+          holdings_count: 2
+        }
+      };
+    }
+    
+    // Production mode: use real database
     // Get portfolio basic info
     const portfolioQuery = `
       SELECT * FROM portfolios WHERE id = $1

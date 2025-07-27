@@ -6,8 +6,75 @@ const router = express.Router();
 // @route   GET /api/assets/search
 // @desc    Search for assets (stocks, ETFs, crypto) from EODHD and CoinGecko
 // @access  Private
-router.get('/search', (req, res) => {
-  res.json({ message: 'Asset search - to be implemented' });
+router.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        error: 'Search query is required'
+      });
+    }
+    
+    // Mock data for testing - in production this would call EODHD and CoinGecko APIs
+    const mockAssets = [
+      {
+        symbol: 'CAT',
+        name: 'Caterpillar Inc.',
+        asset_type: 'stock',
+        exchange: 'US',
+        currency: 'USD',
+        data_source: 'EODHD',
+        price: 280.50
+      },
+      {
+        symbol: 'AAPL',
+        name: 'Apple Inc.',
+        asset_type: 'stock',
+        exchange: 'US', 
+        currency: 'USD',
+        data_source: 'EODHD',
+        price: 192.53
+      },
+      {
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        asset_type: 'crypto',
+        exchange: 'CRYPTO',
+        currency: 'USD',
+        data_source: 'CoinGecko',
+        price: 67420.00
+      },
+      {
+        symbol: 'ETH',
+        name: 'Ethereum',
+        asset_type: 'crypto',
+        exchange: 'CRYPTO',
+        currency: 'USD',
+        data_source: 'CoinGecko',
+        price: 3245.67
+      }
+    ];
+    
+    // Filter assets based on query
+    const filteredAssets = mockAssets.filter(asset => 
+      asset.symbol.toLowerCase().includes(query.toLowerCase()) ||
+      asset.name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    res.json({
+      success: true,
+      data: filteredAssets,
+      message: `Found ${filteredAssets.length} assets matching "${query}"`
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // @route   GET /api/assets/:symbol
