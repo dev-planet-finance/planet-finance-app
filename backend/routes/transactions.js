@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const transactionService = require('../services/transactionService');
+const { verifyFirebaseToken } = require('../middleware/auth');
 
 // @route   GET /api/transactions
 // @desc    Get all transactions for a portfolio
 // @access  Private
-router.get('/', async (req, res) => {
+router.get('/', verifyFirebaseToken, async (req, res) => {
   try {
     const { portfolioId, assetId, actionType, startDate, endDate } = req.query;
     
@@ -36,7 +37,7 @@ router.get('/', async (req, res) => {
 // @route   POST /api/transactions
 // @desc    Create a new transaction (buy, sell, deposit, etc.)
 // @access  Private
-router.post('/', async (req, res) => {
+router.post('/', verifyFirebaseToken, async (req, res) => {
   try {
     const transaction = await transactionService.processTransaction(req.body);
     res.status(201).json({ success: true, data: transaction });
@@ -51,7 +52,7 @@ router.post('/', async (req, res) => {
 // @route   GET /api/transactions/:id
 // @desc    Get specific transaction by ID
 // @access  Private
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyFirebaseToken, async (req, res) => {
   try {
     // TODO: Implement get single transaction
     res.json({ 
@@ -69,7 +70,7 @@ router.get('/:id', async (req, res) => {
 // @route   PUT /api/transactions/:id
 // @desc    Update a transaction
 // @access  Private
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyFirebaseToken, async (req, res) => {
   try {
     const { id } = req.params;
     await transactionService.updateTransaction(id, req.body);
@@ -85,7 +86,7 @@ router.put('/:id', async (req, res) => {
 // @route   DELETE /api/transactions/:id
 // @desc    Delete a transaction
 // @access  Private
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyFirebaseToken, async (req, res) => {
   try {
     const { id } = req.params;
     await transactionService.deleteTransaction(id);
@@ -101,7 +102,7 @@ router.delete('/:id', async (req, res) => {
 // @route   POST /api/transactions/cash
 // @desc    Add cash deposit or withdrawal transaction
 // @access  Private
-router.post('/cash', async (req, res) => {
+router.post('/cash', verifyFirebaseToken, async (req, res) => {
   try {
     const { type, amount, currency, date, platform, notes } = req.body;
     
@@ -152,7 +153,7 @@ router.post('/cash', async (req, res) => {
 // @route   POST /api/transactions/asset
 // @desc    Process asset transaction (buy/sell/transfer)
 // @access  Private
-router.post('/asset', async (req, res) => {
+router.post('/asset', verifyFirebaseToken, async (req, res) => {
   try {
     if (!req.body.asset_id) {
       return res.status(400).json({ 
@@ -174,7 +175,7 @@ router.post('/asset', async (req, res) => {
 // @route   GET /api/transactions/portfolio/:portfolioId
 // @desc    Get transaction history for a specific portfolio
 // @access  Private
-router.get('/portfolio/:portfolioId', async (req, res) => {
+router.get('/portfolio/:portfolioId', verifyFirebaseToken, async (req, res) => {
   try {
     const { portfolioId } = req.params;
     const { assetId, actionType, startDate, endDate } = req.query;
@@ -199,7 +200,7 @@ router.get('/portfolio/:portfolioId', async (req, res) => {
 // @route   POST /api/transactions/bulk
 // @desc    Process multiple transactions at once
 // @access  Private
-router.post('/bulk', async (req, res) => {
+router.post('/bulk', verifyFirebaseToken, async (req, res) => {
   try {
     const { transactions } = req.body;
     

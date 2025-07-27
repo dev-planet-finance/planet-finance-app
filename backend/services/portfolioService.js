@@ -14,21 +14,7 @@ class PortfolioService {
    * @returns {Promise<Object>} Created portfolio
    */
   async createPortfolio(userId, portfolioData) {
-    // Development mode: return mock portfolio
-    if (process.env.NODE_ENV === 'development' || !this.pool) {
-      console.log('🔧 Development mode: Creating mock portfolio');
-      return {
-        id: 'dev-portfolio-' + Date.now(),
-        user_id: userId,
-        name: portfolioData.name || 'My Portfolio',
-        description: portfolioData.description || 'Development portfolio',
-        base_currency: portfolioData.base_currency || 'USD',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-    }
-    
-    // Production mode: use database
+    // Production mode: use real database for MVP
     const query = `
       INSERT INTO portfolios (user_id, name, description, base_currency)
       VALUES ($1, $2, $3, $4)
@@ -52,36 +38,7 @@ class PortfolioService {
    * @returns {Promise<Array>} User's portfolios
    */
   async getUserPortfolios(userId) {
-    // Development mode: return mock portfolios
-    if (process.env.NODE_ENV === 'development' || !this.pool) {
-      console.log('🔧 Development mode: Returning mock portfolios for user:', userId);
-      return [
-        {
-          id: 'dev-portfolio-1',
-          user_id: userId,
-          name: 'My Investment Portfolio',
-          description: 'Main investment portfolio',
-          base_currency: 'USD',
-          holdings_count: '3',
-          total_invested: '15000.00',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: 'dev-portfolio-2',
-          user_id: userId,
-          name: 'Crypto Portfolio',
-          description: 'Cryptocurrency investments',
-          base_currency: 'USD',
-          holdings_count: '2',
-          total_invested: '5000.00',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
-    }
-    
-    // Production mode: use database
+    // Production mode: use real database for MVP
     const query = `
       SELECT 
         p.*,

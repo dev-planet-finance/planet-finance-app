@@ -17,65 +17,6 @@ const OverviewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Mock data for demonstration (matching Magic Patterns style)
-  const mockAssets = [
-    {
-      name: 'Apple Inc.',
-      symbol: 'AAPL',
-      shares: 15,
-      price: 178.72,
-      value: 2680.8,
-      cost: 2200,
-      gain: 480.8,
-      gainPercent: 21.85,
-    },
-    {
-      name: 'Microsoft Corp.',
-      symbol: 'MSFT',
-      shares: 8,
-      price: 403.78,
-      value: 3230.24,
-      cost: 2800,
-      gain: 430.24,
-      gainPercent: 15.37,
-    },
-    {
-      name: 'Amazon.com Inc.',
-      symbol: 'AMZN',
-      shares: 12,
-      price: 178.15,
-      value: 2137.8,
-      cost: 1900,
-      gain: 237.8,
-      gainPercent: 12.52,
-    },
-    {
-      name: 'Tesla Inc.',
-      symbol: 'TSLA',
-      shares: 10,
-      price: 177.67,
-      value: 1776.7,
-      cost: 2000,
-      gain: -223.3,
-      gainPercent: -11.17,
-    },
-    {
-      name: 'Nvidia Corp.',
-      symbol: 'NVDA',
-      shares: 5,
-      price: 950.02,
-      value: 4750.1,
-      cost: 3800,
-      gain: 950.1,
-      gainPercent: 25,
-    },
-  ];
-
-  const totalValue = mockAssets.reduce((sum, asset) => sum + asset.value, 0);
-  const totalCost = mockAssets.reduce((sum, asset) => sum + asset.cost, 0);
-  const totalGain = totalValue - totalCost;
-  const totalGainPercent = (totalGain / totalCost) * 100;
-
   useEffect(() => {
     const fetchPortfolioData = async () => {
       if (!currentUser) {
@@ -112,16 +53,16 @@ const OverviewPage = () => {
         console.error('❌ Error fetching portfolio data:', err);
         setError(err.response?.data?.error || err.message || 'Error loading portfolio data');
         
-        // Fallback to mock data for development
+        // For new users or API errors, show empty portfolio (no mock data)
         setPortfolioData({
-          totalValue: totalValue,
-          totalGainLoss: totalGain,
-          totalGainLossPercent: totalGainPercent,
-          totalAssets: mockAssets.length,
-          totalCash: 5000,
-          holdings: mockAssets
+          totalValue: 0,
+          totalGainLoss: 0,
+          totalGainLossPercent: 0,
+          totalAssets: 0,
+          totalCash: 0,
+          holdings: []
         });
-        console.log('⚠️ Using fallback mock data due to API error');
+        console.log('✅ Showing empty portfolio for new user or API error');
       } finally {
         setLoading(false);
       }
@@ -215,31 +156,38 @@ const OverviewPage = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Performers</h2>
         <div className="space-y-3">
-          {mockAssets.slice(0, 3).map((asset, index) => (
-            <div key={asset.symbol} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-              <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                  index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                  index === 1 ? 'bg-gray-100 text-gray-700' :
-                  'bg-orange-100 text-orange-700'
-                }`}>
-                  {index + 1}
+          {portfolioData.holdings && portfolioData.holdings.length > 0 ? (
+            portfolioData.holdings.slice(0, 3).map((holding, index) => (
+              <div key={holding.symbol || index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                    index === 1 ? 'bg-gray-100 text-gray-700' :
+                    'bg-orange-100 text-orange-700'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{holding.asset_name || holding.symbol || 'Unknown Asset'}</p>
+                    <p className="text-sm text-gray-500">{holding.symbol || 'N/A'}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">{asset.name}</p>
-                  <p className="text-sm text-gray-500">{asset.symbol}</p>
+                <div className="text-right">
+                  <p className="font-semibold text-gray-900">${(holding.current_value || 0).toLocaleString()}</p>
+                  <p className={`text-sm font-medium ${
+                    (holding.gain_loss_percent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {(holding.gain_loss_percent || 0) >= 0 ? '+' : ''}{(holding.gain_loss_percent || 0).toFixed(2)}%
+                  </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-gray-900">${asset.value.toLocaleString()}</p>
-                <p className={`text-sm font-medium ${
-                  asset.gainPercent >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {asset.gainPercent >= 0 ? '+' : ''}{asset.gainPercent.toFixed(2)}%
-                </p>
-              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No holdings to display</p>
+              <p className="text-sm mt-1">Start investing to see your top performers here</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

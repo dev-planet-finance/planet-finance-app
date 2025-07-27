@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const priceService = require('../services/priceService');
+const { verifyFirebaseToken } = require('../middleware/auth');
 
 // @route   GET /api/prices/:symbol
 // @desc    Get price for any asset (auto-detects source from database)
 // @access  Private
-router.get('/:symbol', async (req, res) => {
+router.get('/:symbol', verifyFirebaseToken, async (req, res) => {
   try {
     const { symbol } = req.params;
     const { exchange = 'US', source } = req.query;
@@ -33,7 +34,7 @@ router.get('/:symbol', async (req, res) => {
 // @route   GET /api/prices/stocks/:symbol
 // @desc    Get stock/ETF price from EODHD API
 // @access  Private
-router.get('/stocks/:symbol', async (req, res) => {
+router.get('/stocks/:symbol', verifyFirebaseToken, async (req, res) => {
   try {
     const { symbol } = req.params;
     const { exchange = 'US' } = req.query;
@@ -51,7 +52,7 @@ router.get('/stocks/:symbol', async (req, res) => {
 // @route   GET /api/prices/crypto/:symbol
 // @desc    Get crypto price from CoinGecko API
 // @access  Private
-router.get('/crypto/:symbol', async (req, res) => {
+router.get('/crypto/:symbol', verifyFirebaseToken, async (req, res) => {
   try {
     const { symbol } = req.params;
     
@@ -68,7 +69,7 @@ router.get('/crypto/:symbol', async (req, res) => {
 // @route   GET /api/prices/search
 // @desc    Search for assets across EODHD and CoinGecko
 // @access  Private
-router.get('/search', async (req, res) => {
+router.get('/search', verifyFirebaseToken, async (req, res) => {
   try {
     const { q: query } = req.query;
     
@@ -92,7 +93,7 @@ router.get('/search', async (req, res) => {
 // @route   GET /api/prices/exchange-rates
 // @desc    Get currency exchange rates for multi-currency support
 // @access  Private
-router.get('/exchange-rates', async (req, res) => {
+router.get('/exchange-rates', verifyFirebaseToken, async (req, res) => {
   try {
     // TODO: Implement exchange rate fetching
     // For now, return mock data
@@ -114,7 +115,7 @@ router.get('/exchange-rates', async (req, res) => {
 // @route   POST /api/prices/bulk
 // @desc    Get bulk prices for multiple assets
 // @access  Private
-router.post('/bulk', async (req, res) => {
+router.post('/bulk', verifyFirebaseToken, async (req, res) => {
   try {
     const { assets } = req.body;
     
@@ -138,7 +139,7 @@ router.post('/bulk', async (req, res) => {
 // @route   GET /api/prices/historical/:symbol
 // @desc    Get historical price data for an asset
 // @access  Private
-router.get('/historical/:symbol', async (req, res) => {
+router.get('/historical/:symbol', verifyFirebaseToken, async (req, res) => {
   try {
     const { symbol } = req.params;
     const { period = '1m', exchange = 'US', source } = req.query;
@@ -165,7 +166,7 @@ router.get('/historical/:symbol', async (req, res) => {
 // @route   GET /api/prices/portfolio/:portfolioId/live
 // @desc    Get live prices for all assets in a portfolio
 // @access  Private
-router.get('/portfolio/:portfolioId/live', async (req, res) => {
+router.get('/portfolio/:portfolioId/live', verifyFirebaseToken, async (req, res) => {
   try {
     const { portfolioId } = req.params;
     

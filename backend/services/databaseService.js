@@ -2,14 +2,10 @@ const { Pool } = require('pg');
 
 class DatabaseService {
   constructor() {
-    // Check if we're in development mode
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    // Always use real database for production-ready MVP
+    console.log('📊 Initializing production database connection for MVP launch');
     
-    if (isDevelopment) {
-      console.log('🔧 Development mode: Using mock database service');
-      this.pool = null; // No real database connection in development
-      return;
-    }
+    // Note: Removed development mode mock data for production-ready authentication
     
     // Production mode: Use Railway database
     let connectionString = process.env.DATABASE_URL;

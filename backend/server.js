@@ -33,12 +33,13 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes (will be added later)
+// API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/portfolios', require('./routes/portfolios'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/assets', require('./routes/assets'));
 app.use('/api/prices', require('./routes/prices'));
+app.use('/api/admin', require('./routes/admin')); // Database initialization
 
 // Error handling middleware
 app.use((err, req, res, next) => {

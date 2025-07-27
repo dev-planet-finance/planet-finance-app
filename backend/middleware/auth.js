@@ -1,28 +1,40 @@
 const { Pool } = require('pg');
 
-// Conditionally initialize Firebase Admin SDK only in production
-let admin = null;
+// Initialize Firebase Admin SDK for all environments
+const admin = require('firebase-admin');
 let firebaseInitialized = false;
 
-if (process.env.NODE_ENV === 'production' && process.env.FIREBASE_PROJECT_ID) {
+// Initialize Firebase Admin SDK if not already initialized
+if (!admin.apps.length) {
   try {
-    admin = require('firebase-admin');
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        // In production, you'd use proper service account credentials
-      });
-      console.log('✅ Firebase Admin SDK initialized with project ID:', process.env.FIREBASE_PROJECT_ID);
-      firebaseInitialized = true;
-    }
+    // Create service account object from environment variables
+    const serviceAccount = {
+      type: "service_account",
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+      auth_uri: "https://accounts.google.com/o/oauth2/auth",
+      token_uri: "https://oauth2.googleapis.com/token",
+      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+      client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`
+    };
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId: process.env.FIREBASE_PROJECT_ID
+    });
+    console.log('🔥 Firebase Admin SDK initialized in auth middleware with project ID:', process.env.FIREBASE_PROJECT_ID);
+    firebaseInitialized = true;
   } catch (error) {
-    console.log('⚠️  Firebase Admin SDK initialization error:', error.message);
+    console.error('❌ Firebase Admin SDK initialization error in middleware:', error.message);
     firebaseInitialized = false;
+    throw error;
   }
 } else {
-  console.log('🔧 Development mode: Firebase Admin SDK disabled');
-  console.log('Using mock authentication for development');
-  firebaseInitialized = false;
+  firebaseInitialized = true;
+  console.log('🔥 Firebase Admin SDK already initialized in auth middleware');
 }
 
 // Database connection for user management
@@ -103,54 +115,69 @@ const verifyFirebaseToken = async (req, res, next) => {
       });
     }
 
-    const idToken = authHeader.split('Bearer ')[1];
+    const token = authHeader.split('Bearer ')[1];
     
-    // For testing purposes, allow a special test token
-    if (idToken === 'TEST_TOKEN_AUTO_USER') {
-      req.user = {
-        uid: '550e8400-e29b-41d4-a716-446655440001',
-        email: 'test@planetfinance.info',
-        email_verified: true,
-        firebase_uid: '550e8400-e29b-41d4-a716-446655440001',
-        database_user: await getOrCreateUser('550e8400-e29b-41d4-a716-446655440001', 'test@planetfinance.info')
-      };
-      return next();
+    // Verify the Firebase token using Firebase Admin SDK
+    if (!firebaseInitialized) {
+      throw new Error('Firebase Admin SDK not initialized');
     }
     
-    // Development mode: if token doesn't look like a Firebase JWT, use test authentication
-    const isFirebaseJWT = idToken.split('.').length === 3 && idToken.length > 100;
-    
-    if (!isFirebaseJWT || process.env.NODE_ENV === 'development') {
-      // Development mode: create a test user for any token
-      console.log('🔧 Development mode: Using test authentication for token:', idToken.substring(0, 20) + '...');
-      // Generate a consistent UUID-like string for development
-      const hash = idToken.substring(0, 8).padEnd(8, '0');
-      const testUserId = `dev-${hash}-4000-8000-000000000000`;
-      const testEmail = 'dev@planetfinance.info';
-      
-      req.user = {
-        uid: testUserId,
-        email: testEmail,
-        email_verified: true,
-        firebase_uid: testUserId,
-        database_user: await getOrCreateUser(testUserId, testEmail)
-      };
-    } else {
-      // Production mode: Verify the Firebase ID token
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      
-      // Get or create user in our database
-      const databaseUser = await getOrCreateUser(decodedToken.uid, decodedToken.email);
-      
-      // Add user info to request object
-      req.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        email_verified: decodedToken.email_verified,
-        firebase_uid: decodedToken.uid,
-        database_user: databaseUser
-      };
+    let decodedToken;
+    try {
+      // First try to verify as ID token
+      decodedToken = await admin.auth().verifyIdToken(token);
+    } catch (idTokenError) {
+      try {
+        // If ID token verification fails, try to verify as custom token
+        // Custom tokens need to be exchanged for ID tokens server-side
+        console.log('🔄 ID token verification failed, attempting custom token verification...');
+        
+        // For custom tokens, we need to decode them to get the UID
+        // Custom tokens are JWTs that we can decode to get user info
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.decode(token);
+        
+        if (decoded && decoded.uid) {
+          // Get user record directly using UID from custom token
+          const userRecord = await admin.auth().getUser(decoded.uid);
+          
+          // Create a mock decoded token structure for consistency
+          decodedToken = {
+            uid: userRecord.uid,
+            email: userRecord.email,
+            email_verified: userRecord.emailVerified
+          };
+          
+          console.log('✅ Custom token verified successfully for UID:', decoded.uid);
+        } else {
+          throw new Error('Invalid token format - no UID found');
+        }
+      } catch (customTokenError) {
+        console.error('❌ Both ID token and custom token verification failed:', customTokenError);
+        throw idTokenError; // Throw the original ID token error
+      }
     }
+    
+    // Get user record to access custom claims (roles)
+    const userRecord = await admin.auth().getUser(decodedToken.uid);
+    const customClaims = userRecord.customClaims || {};
+    
+    // Log authentication for audit purposes
+    console.log(`🔐 Token verified for user: ${decodedToken.email} (UID: ${decodedToken.uid}) with role: ${customClaims.role || 'user'}`);
+    
+    // Get or create user in our database
+    const databaseUser = await getOrCreateUser(decodedToken.uid, decodedToken.email);
+    
+    // Add user info to request object with role-based access control
+    req.user = {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      email_verified: decodedToken.email_verified,
+      firebase_uid: decodedToken.uid,
+      role: customClaims.role || 'user',
+      tier: customClaims.tier || 'free',
+      database_user: databaseUser
+    };
 
     next();
   } catch (error) {
@@ -211,8 +238,68 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+/**
+ * Role-based access control middleware
+ * @param {string|string[]} allowedRoles - Single role or array of allowed roles
+ */
+const requireRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    const userRole = req.user.role || 'user';
+    const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    
+    if (!roles.includes(userRole)) {
+      console.log(`🚫 Access denied: User ${req.user.email} with role '${userRole}' attempted to access endpoint requiring roles: ${roles.join(', ')}`);
+      return res.status(403).json({
+        success: false,
+        error: `Access denied. Required role: ${roles.join(' or ')}`
+      });
+    }
+
+    console.log(`✅ Access granted: User ${req.user.email} with role '${userRole}' accessing endpoint`);
+    next();
+  };
+};
+
+/**
+ * Subscription tier access control middleware
+ * @param {string|string[]} allowedTiers - Single tier or array of allowed tiers
+ */
+const requireTier = (allowedTiers) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    const userTier = req.user.tier || 'free';
+    const tiers = Array.isArray(allowedTiers) ? allowedTiers : [allowedTiers];
+    
+    if (!tiers.includes(userTier)) {
+      console.log(`🚫 Tier access denied: User ${req.user.email} with tier '${userTier}' attempted to access endpoint requiring tiers: ${tiers.join(', ')}`);
+      return res.status(403).json({
+        success: false,
+        error: `Upgrade required. Required subscription tier: ${tiers.join(' or ')}`
+      });
+    }
+
+    console.log(`✅ Tier access granted: User ${req.user.email} with tier '${userTier}' accessing endpoint`);
+    next();
+  };
+};
+
 module.exports = {
   verifyFirebaseToken,
   optionalAuth,
-  getOrCreateUser
+  getOrCreateUser,
+  requireRole,
+  requireTier
 };

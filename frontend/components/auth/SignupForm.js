@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function SignupForm({ onToggleMode }) {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function SignupForm({ onToggleMode }) {
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup, error } = useAuth();
+  const router = useRouter();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -22,7 +24,8 @@ export default function SignupForm({ onToggleMode }) {
       setLoading(true);
       const result = await signup(email, password, displayName);
       console.log('✅ Account created successfully:', result.user.email);
-      // Don't set loading to false here - let the auth state change handle it
+      // Redirect to dashboard after successful signup
+      router.push('/dashboard');
     } catch (error) {
       console.error('❌ Signup failed:', error);
       setLoading(false);

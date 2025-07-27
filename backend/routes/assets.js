@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const { verifyFirebaseToken } = require('../middleware/auth');
 
 // Placeholder routes for asset management and search
 
 // @route   GET /api/assets/search
 // @desc    Search for assets (stocks, ETFs, crypto) from EODHD and CoinGecko
 // @access  Private
-router.get('/search', async (req, res) => {
+router.get('/search', verifyFirebaseToken, async (req, res) => {
   try {
     const { query } = req.query;
     

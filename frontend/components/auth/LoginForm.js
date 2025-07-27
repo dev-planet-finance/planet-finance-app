@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from '../ui/ThemeToggle';
 
 export default function LoginForm({ onToggleMode }) {
@@ -9,6 +10,7 @@ export default function LoginForm({ onToggleMode }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, error } = useAuth();
+  const router = useRouter();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -16,6 +18,8 @@ export default function LoginForm({ onToggleMode }) {
     try {
       setLoading(true);
       await login(email, password);
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
