@@ -159,7 +159,7 @@ npm run dev  # Starts on port 3002
 ## 📚 Documentation
 
 - **[Backend API Documentation](./backend/README.md)** - Complete API reference
-- **[Database Schema](./database/README.md)** - Database design and setup
+- **[Database Schema](./backend/database/README.md)** - Database design and setup
 - **[Frontend Components](./frontend/README.md)** - UI component library
 
 ## 🎨 Design Philosophy
